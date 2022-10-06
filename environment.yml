@@ -1,0 +1,14 @@
+name: faps
+channels:
+  - defaults
+dependencies:
+  - pip
+  - numpy
+  - scipy
+  - pandas
+  - setuptools=52.0.0
+  - python=3.9.2
+  - tqdm
+  - pip:
+    - faps
+    - -e 02_library/python

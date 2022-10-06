@@ -1,0 +1,9 @@
+Script to import and format genotype and phenotype information.
+
+Since FAPS uses various classes to deal with these data that aren't easily
+stored as a text file, this script is run every time a subsequent analysis is
+run. Genotype and phenotype data are stored into a single object called `am_data`
+which is a `faps_data` class (see `02_library/python/amajusdata/faps_data.py`).
+This is just a placeholder to keep the various datasets in one place, and also 
+includes several functions to update parameters for paternity data such as the
+proportion of missing fathers.
