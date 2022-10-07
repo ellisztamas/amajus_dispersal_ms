@@ -1,3 +1,10 @@
+"""
+Functions related to calculating probabilities of dispersal under the generalised
+normal distribution.
+
+Tom Ellis
+"""
+
 import numpy as np
 from scipy.special import gamma
 import pandas as pd

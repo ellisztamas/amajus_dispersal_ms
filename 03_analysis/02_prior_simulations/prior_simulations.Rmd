@@ -1,0 +1,148 @@
+---
+title: "Prior simulations for the generalised-normal dispersal kernel"
+author: "Tom Ellis"
+date: "18/01/2021"
+output: 
+  bookdown::pdf_document2:
+    toc: true
+    fig_caption: yes
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source("02_library/R/prior_simulations.R")
+set.seed(1204 )
+```
+
+This Rmarkdown file outlines the process of coming up with sensible (hyper)priors for pollen dispersal.
+
+# Model of dispersal
+
+As outlined in the main text, we model distance $d_{mj}$ between the
+maternal plant and the $j^{th}$ pollen donor using the generalised
+normal distribution (GND), which takes scale and shape parameters $a$
+and $b$:
+
+$$ GND(d_{mj},a,b) = K \exp \left(\frac{-d_{mj}}{a} \right)^b $$
+where $K = b/({2a\Gamma(^1/_b)})$ and is a normalising constant and $\Gamma$
+is Euler's gamma function. This is a generalisation of the exponential family of distributions; importantly, when $b=1$ or $b=2$ this represents the exponential and normal distributions respectively.
+
+This is modified to become a mixture of a GND
+and a uniform distribution to allow for non-sire candidates who have a
+high probability of paternity just by chance. The relative weighting to
+these two distributions is controlled by mixture parameter $\lambda$:
+
+$$ \Pr(d_{mj}|a,b,\lambda) = \lambda GND(d_{mj},a,b) + \frac{1-\lambda}{N} $$
+**To perform MCMC we need to set priors on $a, b$ and $\lambda$.**
+
+# Mixture parameter
+
+For $\lambda$, we use a beta distribution with parameters
+$\mathcal{B}(1.1, 1.1)$ (figure \@ref(fig:lambda-prior)). This
+distribution is close to zero at the tails, but is fairly flat in
+between. This implies that we don't think that all the weight should be
+on either the GND or the uniform components of the mixture distribution,
+but we don't have strong prior beliefs about values between that.
+
+```{r lambda-prior, fig.cap="Prior distribution for $\\lambda$."}
+x_lambda <- seq(0,1, 0.01)
+y <- dbeta(x_lambda, 1.1, 1.1)
+plot(x_lambda, y, type='l', xlab = "Mixture parameter", ylab = "Prior density")
+```
+
+# Generalised normal distribution
+
+## Setting up prior simulations
+
+We are not aware of commonly used conjugate prior distributions for the shape and scale parameters of the GND. Here we use Gamma hyperpriors on $a$ and $b$ because (1) this guarantees values are positive and (2) this is often done for parameters of the normal and exponential distributions, which are special cases of the GND.
+
+However, it is not easy to come up with sensible values to parameterise these hyperpriors a priori, since $a$ and $b$ depend on each other and have no obvious biological interpretation themselves. Instead we rely on prior simulations to determine suitable hyperpriors.
+
+Since we also lack a pseudo-random number generator for the generalised normal distribution we instead approximate this by drawing values along a number line. We first simulate vectors of values for $a$ and $b$ from Gamma distributions. For example:
+
+```{r, eval=F}
+nsims <- 1000
+shape <- rgamma(shape=10, scale = 1/6, n = nsims)
+scale <- rgamma(shape=6, scale = 50, n = nsims)
+```
+
+We then use each pair of simulated values to parameterise a GND, and use that to assign probabilities to evenly spaced values between 0 and 3000. We then draw those values in proportion to their probability under a given set of parameters. This is repeated `n` times to give a distribution of prior dispersal distances for the given hyperprior parameters. Because these distances reflect distances in Euclidean space it is intuitive to compare and discuss those distributions and their biological plausibility.
+
+```{r, eval=F}
+# Vector of values to draw
+x <- seq(1, 3000, 0.1)
+# Carry out prior simulation.
+# Simulation is carried out with this function
+# See `02_library/R/prior_simulations.R` for details
+prior_sim(x, scale, shape, n = 10)
+```
+
+## Dispersal scenarios
+
+We focus on three combinations of hyperprior values corresponding to different plausible dispersal scenarios with differing degrees of leptokurtosis. We examine dispersal up to 3000m, drawing 1000 values from Gamma distributions for $a$ and $b$, and generate 10,000 data points for each combination of values.
+
+```{r}
+x <- seq(1, 3000, 0.1)
+n_draws_per_sim <- 10000
+nsims <- 1000
+```
+
+### Restricted kurtosis
+
+- Hyperprior for $a = \Gamma(10, 6)$
+- Hyperprior for $b = \Gamma(6, 50)$
+- Values for $b$ are unimodal around approximately $b=2$, with most of the prior mass between 1 and 3, reflecting something like Gaussian dispersal.
+- These hyperpriors give prior distributions that are moderately skeptical about kurtosis - 9.2% of the prior mass for $b$ is below 1.
+- This allows for a fair amount of dispersal up to ~500m, but is skeptical about dispersal beyond that.
+
+```{r restricted-kurtosis, echo = F, fig.height=8/2.54}
+par(mfrow=c(1,3))
+# Generate hyperprior values
+shape <- rgamma(shape=10, scale = 1/6, n = nsims)
+scale <- rgamma(shape=6, scale = 50, n = nsims)
+
+sim <- prior_sim(x, scale, shape, n = n_draws_per_sim)
+hist(shape, main="Prior draws for shape")
+hist(scale, main="Prior draws for scale")
+hist(sim$draws, main="Prior simulated data")
+```
+
+### Kurtosis at short scale
+
+- Scale hyperprior: $a = \Gamma(2, 1/3)$
+- Shape hyperprior: $b = \Gamma(2, 1/2)$
+- These priors allow for leptokurtosis - 60.5% of the prior weight for $b$ is less than 1, but the small values for shape heavily penalise long-range dispersal.
+- This results in a scenario where most dispersal happens at small scales, but there is a tail of long range dispersal distances.
+
+```{r short-range-kurtosis, echo = F, fig.height=8/2.54}
+par(mfrow=c(1,3))
+
+scale <- rgamma(shape=2, scale = 3, n = nsims)
+shape <- rgamma(shape=2, scale = 1/2, n = nsims)
+sim <- prior_sim(x, scale, shape, n = n_draws_per_sim)
+hist(shape, main="Prior draws for shape")
+hist(scale, main="Prior draws for scale")
+hist(sim$draws, main="Prior simulated data")
+```
+
+### Penalising leptokurtosis
+
+- Scale hyperprior: $a = \Gamma(6, 1/50)$
+- Shape hyperprior: $b = \Gamma(20, 5)$
+- Less than 1% of the prior density for $b$ is less below 2, indicating that these priors are very skeptical about distributions with fat tails, and favouring models with thinner tails than a Gaussian.
+- Consistent with this, these priors are very skeptical about dispersal distances beyond a few hundred metres, with almost no support for dispersal beyond 800m.
+
+```{r penalise-kurtosis, echo = F, fig.height=8/2.54}
+par(mfrow=c(1,3))
+
+scale <- rgamma(shape=6, scale = 50, n = nsims)
+shape <- rgamma(shape=20, scale = 1/5, n = nsims)
+sim <- prior_sim(x, scale, shape, n = n_draws_per_sim)
+hist(shape, main="Prior draws for shape")
+hist(scale, main="Prior draws for scale")
+hist(sim$draws, main="Prior simulated data")
+```
+
