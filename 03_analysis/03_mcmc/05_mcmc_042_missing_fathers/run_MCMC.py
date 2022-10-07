@@ -19,7 +19,7 @@ from amajusmating import mcmc
 exec(open('03_analysis/01_data_formatting/setup_FAPS_GPS.py').read())
 
 # INITIALISE THE MODEL
-nreps = 4#000 # Total number of iterations to run
+nreps = 4000 # Total number of iterations to run
 thin  = 10 # How often to write samples.
 max_distance = np.inf # set a maximum dispersal distance. Using `np.inf` sets no limit.
 # output_dir = "005.results/004_mcmc_restrict_kurtosis/output/"
