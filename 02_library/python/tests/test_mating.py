@@ -26,7 +26,7 @@ from amajusmating import mating
 
 
 # FAPS objects and distance matrices are generated in a separate script.
-exec(open('003.scripts/setup_FAPS_GPS.py').read())
+exec(open('03_analysis/01_data_formatting/setup_FAPS_GPS.py').read())
 
 model = {
     'missing' : 0.29,

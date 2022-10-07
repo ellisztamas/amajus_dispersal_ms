@@ -2,6 +2,7 @@
 Tom Ellis, March 2021
 
 Class to hold FAPS objects and variables related to dispersal and assortative mating.
+There are also wrapper functions to simplify passing to internal FAPS objects.
 """
 
 import numpy as np

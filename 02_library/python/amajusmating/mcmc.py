@@ -1,15 +1,25 @@
+"""
+Functions to set up, run and save the output of a Metropolis-Hastings MCMC of
+dispersal, paternity and sibship relationships.
+
+Out of the box, this module will update variables 
+1. 'missing': Proportion of missing fathers from the dataset. Not used.
+2. 'shape': Shape parameter of the generalised normal distribution
+3. 'scale': Scale parameter of the generalised normal distribution
+4. 'mixture': Proportion of signal coming from real dispersal, and not
+    candidates with unusually high likelihood of paternity.
+5. 'assortment': Probability of assortative mating between flower colour 
+    phenotypes of the same type. Not used.
+
+Tom Ellis
+"""
+
 import numpy as np
 import faps as fp
 from pprint import pprint
-import sys
 from time import time, strftime
 from tqdm import tqdm
 import platform
-
-from amajusmating.dispersal import dispersal_GND
-
-from scipy.stats import beta
-from scipy.stats import gamma as gma
 
 def check_parameters(model, sigma):
     """

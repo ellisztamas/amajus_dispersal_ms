@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 
-exec(open('003.scripts/setup_FAPS_GPS.py').read())
+exec(open('03_analysis/01_data_formatting/setup_FAPS_GPS.py').read())
 
 def test_there_are_60_mothers():
     assert len(am_data.paternity) == 60
