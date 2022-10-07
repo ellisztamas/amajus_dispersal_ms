@@ -12,3 +12,4 @@ dependencies:
   - pip:
     - faps
     - -e 02_library/python
+    - wquantiles
