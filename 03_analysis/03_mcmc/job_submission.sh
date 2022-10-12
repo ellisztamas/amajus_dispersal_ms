@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 # SLURM
-#SBATCH --mem=40GB
+#SBATCH --mem=10GB
 #SBATCH --output=./03_analysis/03_mcmc/log.txt
 #SBATCH --qos=medium
-#SBATCH --time=24:00:00
+#SBATCH --time=4-00:00:00
 #SBATCH --array=0-4
 
 # ENVIRONMENT #
