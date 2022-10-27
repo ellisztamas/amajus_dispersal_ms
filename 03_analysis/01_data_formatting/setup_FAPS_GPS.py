@@ -85,7 +85,12 @@ print("Incorportating GPS and flower-colour data.")
 gps = pd.read_csv("01_data/GPS_positions.csv", index_col=0)
 gps = gps.loc[adults.names] # reorder to match cleaned SNP data
 gps = gps[['Easting','Northing']] # remove the column for altitude. We don't need that here.
-# gps_mothers = gps.loc[mothers.keys()] # GPS coordinates for the mothers only.
+# Save GPS positions so they can be used in R.
+gps.\
+    assign(
+        is_mother = gps.index.isin(list(mothers.keys())) # Add a column stating whether the plant is also a mother
+    ).\
+        to_csv("01_data/processed_GPS_positions.csv", index = True) 
 
 # FLOWER COLOUR
 # Import flower colour data for the population
@@ -104,6 +109,14 @@ am_data = faps_data(
     flower_colours = ros_sulf[['rosea','sulfurea', 'simple_colour']],
     params = {}
     )
+
+# A table of maternal family sizes for each mother.
+# Save it now so we can easily import in R later
+pd.DataFrame({
+    'mother' : am_data.mothers,
+    'n_offspring': [len(x.offspring) for x in am_data.paternity.values()]
+}).to_csv("01_data/maternal_family_sizes.csv", index = False)
+
 
 # Remove variables we don't need anymore.
 del(md, r, h, ros_sulf, patlik, lx)

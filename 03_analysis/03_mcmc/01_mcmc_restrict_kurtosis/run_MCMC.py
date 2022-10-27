@@ -32,8 +32,8 @@ np.random.seed(87)
 priors = (lambda x : {
     'missing' : beta.pdf(x['missing'], a=3,   b=15),
     'mixture' : beta.pdf(x['mixture'], a=1.1, b=1.1),
-    'shape'   : gamma.pdf(x['shape'],   a=10,  scale = 1/5),
-    'scale'   : gamma.pdf(x['scale'],   a=6,   scale = 50)
+    'shape'   : gamma.pdf(x['shape'],  a=10,  scale = 1/5),
+    'scale'   : gamma.pdf( x['scale'], a=6,   scale = 50)
 })
 
 # Proposed values are a Gaussian peturbation away from the previous values.

@@ -3,8 +3,8 @@
 # SLURM
 #SBATCH --mem=10GB
 #SBATCH --output=./03_analysis/03_mcmc/log.txt
-#SBATCH --qos=medium
-#SBATCH --time=4-00:00:00
+#SBATCH --qos=long
+#SBATCH --time=8-00:00:00
 #SBATCH --array=0-4
 
 # ENVIRONMENT #

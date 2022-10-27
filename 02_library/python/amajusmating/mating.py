@@ -9,7 +9,7 @@ import weighted
 
 import faps as fp
 
-def import_mcmc(folder, burnin):
+def import_mcmc(folder, burnin, mixture_is_1 = True):
     """
     Import and trim multiple files with MCMC output for A. majus mating
     parameters.
@@ -42,9 +42,10 @@ def import_mcmc(folder, burnin):
         k = os.path.basename(chain)
         posterior[k] = pd.read_csv(chain, sep="\t").loc[lambda x: x.iter >= burnin]
     posterior = pd.concat(posterior).reset_index()
-    # For this script we are only interested in the generalised-Gaussian part
-    # of the dispersal kernel, so set `mixture` to 1 for all rows.
-    posterior['mixture'] = 1
+    if mixture_is_1:
+        # If we are only interested in the generalised-Gaussian part
+        # of the dispersal kernel, so set `mixture` to 1 for all rows.
+        posterior['mixture'] = 1
 
     return posterior
 
@@ -204,6 +205,7 @@ def mating_over_chains(data, input_dir, output_dir, burnin = 500, ndraws = 1000)
         model = mcmc.loc[i]
         # Simulate mating events, and include GPS and phentoype information about mother and sire
         data.mating = get_mating_events(data, model)
+        data.mating.insert(loc=0, column='iter', value=i)
 
         # Full list of mothers, fathers and the probabilities for each mating event.
         sires[i] = data.mating
