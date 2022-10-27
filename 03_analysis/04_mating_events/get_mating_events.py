@@ -26,17 +26,13 @@ burnin = 1500
 
 # Input and output data
 input_dir = args.input
-output_dir = os.path.dirname(os.path.abspath(__file__)) + '/output/'
-output_dir = output_dir + os.path.basename(args.input)
-print(output_dir)
+output_dir = os.path.dirname(os.path.abspath(__file__)) + '/output/' + os.path.basename(args.input)
 os.makedirs(output_dir, exist_ok=True)
 
 print("\nInferring mating events from each iteration of the MCMC chain, discarding the first {} iterations as burn-in.\n\n".format(burnin))
-# mating.mating_over_chains(
-#     data = am_data,
-#     input_dir = input_dir,
-#     output_dir = output_dir,
-#     burnin = burnin
-#     )
-
-os.path.basename("03_analysis/03_mcmc/01_mcmc_restrict_kurtosis")
+mating.mating_over_chains(
+    data = am_data,
+    input_dir = input_dir + '/output/',
+    output_dir = output_dir,
+    burnin = burnin
+    )
