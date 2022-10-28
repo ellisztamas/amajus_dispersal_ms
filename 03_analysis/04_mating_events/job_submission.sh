@@ -4,7 +4,7 @@
 #SBATCH --mem=10GB
 #SBATCH --qos=medium
 #SBATCH --output=./03_analysis/04_mating_events/log.txt
-#SBATCH --time=00:10:00
+#SBATCH --time=1-00:00:00
 #SBATCH --array=0-5
 
 # ENVIRONMENT #

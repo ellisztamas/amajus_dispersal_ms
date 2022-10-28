@@ -26,7 +26,7 @@ burnin = 1500
 
 # Input and output data
 input_dir = args.input
-output_dir = os.path.dirname(os.path.abspath(__file__)) + '/output/' + os.path.basename(args.input)
+output_dir = os.path.dirname(os.path.abspath(__file__)) + '/output/' + os.path.basename(args.input) + '/'
 os.makedirs(output_dir, exist_ok=True)
 
 print("\nInferring mating events from each iteration of the MCMC chain, discarding the first {} iterations as burn-in.\n\n".format(burnin))
