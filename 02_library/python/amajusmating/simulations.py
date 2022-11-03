@@ -176,7 +176,6 @@ def simulation_paternity(data, model, mating_events, genotypes, mu):
     # 2. Sibship clustering
     # 3. Sibships plus covariates
     # 4. Probability that the father was missing when he was present
-    # 5. One more column will be added later
     output = {}
     for k in sim_progeny.keys():
         # Index positions of the true father
@@ -190,16 +189,6 @@ def simulation_paternity(data, model, mating_events, genotypes, mu):
             'sibs_covs' : sc_cov[k].posterior_paternity_matrix()[ ix[0], ix[1] ],
             'false_negative' :sc_cov[k].posterior_paternity_matrix()[:, -1]
         })
-
-    # Remove the real fathers and cluster into sibships again
-    for k in patlik.keys():
-        patlik[k].purge = sim_progeny[k].fathers
-    sc_purged = fp.sibship_clustering(patlik, use_covariates=True)
-
-    # Add extra column to output for the probability that the father was absent
-    # when he really was absent.
-    for k in sim_progeny.keys():
-        output[k]['true_negative' ] = sc_purged[k].posterior_paternity_matrix()[:, -1]
 
     output = pd.concat(output.values())
     
