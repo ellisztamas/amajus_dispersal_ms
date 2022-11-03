@@ -33,6 +33,34 @@ mean_me <- me %>%
     n = sum(prob) / 1000
   )
 
+me %>% 
+  mutate(father_found = !is.na(father)) %>% 
+  group_by(father_found, iter) %>% 
+  summarise(
+    n = sum( offspring * prob)
+  ) %>% 
+  group_by(father_found) %>% 
+  summarise(
+    mean = mean(n),
+    lower = quantile(n, 0.02),
+    upper = quantile(n, 0.98)
+    ) %>% 
+  View()
+
+me %>% 
+  filter(is.na(father)) %>% 
+  group_by(iter) %>% 
+  summarise(
+    n = n()
+  ) %>%  pull(n)
+
+ms <- read_csv("03_analysis/04_mating_events/output/01_mcmc_restrict_kurtosis/summarise_mating.csv")
+
+mean(ms$n_mating_events)
+quantile(ms$n_mating_events, c(0.02, 0.98))
+  
+  
+
 # Poisson GLM for the number of mating events as a function of the number of 
 # progeny in the maternal family.
 mod <- glm(n ~ array_size, data = mean_me, family = poisson)
@@ -77,4 +105,4 @@ sim <- sapply(1:1000, function(x){
 mean(sim)
 quantile(sim, c(0.02, 0.98))
 
-132 / (217+132)
+132 / (212+132)
