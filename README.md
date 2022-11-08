@@ -21,3 +21,9 @@ Activate it before running analyses with
 conda activate faps
 
 ```
+
+### R
+
+The cumulative pollen dispersal kernel is plotted with a custom function by 
+[Nicolas Woloscko](https://github.com/NicolasWoloszko/stat_ecdf_weighted/blob/master/stat_ecdf_weighted.R)
+to allow for weighted samples. This requires the CRAN package `spatstat`.

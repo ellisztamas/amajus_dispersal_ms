@@ -1,5 +1,5 @@
-Python scripts to infer mating events between mothers and individual pollen donors.
-This is done for the output of the MCMC analysis in
+Python scripts to infer mating events between mothers and individual pollen
+donors. This is done for the output of the MCMC analysis in
 `03_analysis/03_mcmc/01_mcmc_restrict_kurtosis/`. This takes each of the four
 chains, discards the first 1500 iterations as burn-in, and infers mating events
 based on dispersal parameters for each of the 1000 remaining iterations.
@@ -23,4 +23,7 @@ and plausible fathers for each iteration separately. This shows:
 * GPS and flower-colour information
 
 `get_mating_events()` also generates a table summarising mating events for each
-iterations
+iteration.
+
+`job_submission.sh` is a bash script that runs the mating script on each MCMC
+output, and submits this as a job array to SLURM.

@@ -110,9 +110,7 @@ def get_mating_events(data, model, max_distance = np.inf):
     mating_events = mating_events.\
         merge(data.gps['Easting'], how='left', left_on='mother', right_index=True) .\
         merge(data.gps['Easting'], how='left', left_on='father', right_index=True, suffixes = ['_mother', "_father"]).\
-        merge(distance_df, how="left", on=['mother', 'father']).\
-        merge(data.flower_colours, how="left", left_on="mother", right_index=True).\
-        merge(data.flower_colours, how="left", left_on="father", right_index=True, suffixes = ['_mother', "_father"])
+        merge(distance_df, how="left", on=['mother', 'father'])
     
     return mating_events
 
