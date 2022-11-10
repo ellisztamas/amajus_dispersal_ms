@@ -11,7 +11,7 @@ plist <- list(
       )
 )
 
-plot_posteriors <- ggarrange(plotlist = plist, ncol=1, heights = c(1,1,1,1,1.7), labels = 'AUTO')
+plot_posteriors <- ggarrange(plotlist = plist, ncol=1, heights = c(1,1,1,1.5), labels = 'AUTO')
 
 ggsave(
   filename = "05_manuscript/posterior_distributions.eps",
