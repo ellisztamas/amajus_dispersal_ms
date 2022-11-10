@@ -15,7 +15,7 @@ plot_posteriors <- ggarrange(plotlist = plist, ncol=1, heights = c(1,1,1,1,1.7),
 
 ggsave(
   filename = "05_manuscript/posterior_distributions.eps",
-  plot = map,
+  plot = plot_posteriors,
   device = "eps",
   width = 16.9,
   height = 22,
