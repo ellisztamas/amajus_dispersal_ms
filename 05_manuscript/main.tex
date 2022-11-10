@@ -194,11 +194,12 @@ Ideally one would also like to update the proportion \textit{q} of missing fathe
 
 \subsubsection{Study population}
 
-\begin{figure}
-	\includegraphics[]{map.png} % Figure image
+\begin{figure*}
+    \centering
+	\includegraphics[]{map.eps} % Figure image
 	\caption{Map of the hybrid zone. The map shows the distribution of maternal plants and sampled candidate pollen donors along the lower (South) and upper (North) roads.}
 	\label{map} % Label for referencing with \ref{bear}
-\end{figure}
+\end{figure*}
 
 We examine a hybrid zone population of the snapdragon \textit{Antirrhinum majus} in the Spanish Pyrenees. Here, the yellow-flowered \textit{A. m. striatum} and the magenta-flowered \textit{A. m. pseudomajus} meet and hybridise to produce diverse recombinant phenotypes, including pink, white and orange flowers.
 The population grows along two parallel roads running East-West close to Rib\"{e}s de Freser (figure Fig. \ref{map}). The ’lower’ road is at 1150-1200m above sea level, whilst the ’upper’ road climbs 1250-1500m, and is 500-1000m north of the lower road. Hybrids are mostly confined to a 1km ’core’ hybrid zone, with \textit{A. m. striatum}- and \textit{A. m. pseudomajus}-like plants becoming dominant to the West and East respectively. We surveyed as many flowering plants as we could find in June and July of 2012 (n=2124), and collected information on flower number and location using a Trimble GeoXT datalogger. We collected two to three leaves for DNA extraction and dried these in silica gel (Fischer Scientific). \textit{A. majus} grows in disturbed habitats such as roadsides and railways; they are rare in the established forest and pasture between the two roads, on the north-facing slope to the South, and on the high mountain peak to the North of the two roads. It thus is likely that we sampled the majority of the plants that flowered during the study period, although we cannot exclude that some flowering may have occurred before or after this. 
@@ -232,8 +233,9 @@ Given that in the observed data we found that most offspring/sibships had one cl
 For (2) and (3) we used FAPS to calculate the mean probability of paternity over possible sibship partition structures, weighted by the likelihood of each partition structure, for each individual offspring. In all cases we used a prior probability for the proportion of missing fathers of 0.32. In this way we were able to assess the power to detect a true father for each simulated individual.
 
 \section{Results}
+
 \begin{figure}
-\includegraphics[]{posterior_distributions.png}
+\includegraphics{posterior_distributions.eps}
 \caption{Summaries of posterior distributions showing means and 96\% credible intervals.}
 \label{posterior_summaries}
 \end{figure}
@@ -252,11 +254,12 @@ For all sixty mothers we found a mating event with non-zero probability for whic
 
 \subsection{Pollen dispersal is leptokurtic}
 
-\begin{figure}
-    \includegraphics{dispersal.png}
+\begin{figure*}
+    \centering
+    \includegraphics{dispersal.eps}
     \caption{Distribution of pollen-dispersal distances.  (A) Histogram and (B) cumulative distribution of distances for mating events under the “restricted-kurtosis” prior scenario. Note the log10 scale of the x-axis in B. Mating events are weight weighted by their posterior probability. The histogram is summed over iterations of the MCMC. Separate cumulative curves are shown for 1000 MCMC iterations separately. (C) Median dispersal distances and (D) the number of sires more than 500m from the mother across six prior scenarios, showing posterior means and 96\% credible intervals.}
     \label{fig:dispersal}
-\end{figure}
+\end{figure*}
 
 The posterior distribution of both the scale and shape parameters of pollen dispersal varied between prior dispersal scenarios, but in all cases the shape parameter was consistently less than 1 (Fig. \ref{posterior_summaries}, Fig. SX), indicating leptokurtic dispersal kernels. This was true even for the ‘penalise-kurtosis’ prior scenario, which sets essentially zero prior mass on leptokurtosis (Fig. S1). Consistent with this, the distribution of pollen dispersal distances shows a peak close to zero, with a long tail of long-distance dispersal events up to 2102m (Fig. \ref{fig:dispersal}A). Posterior-mean median dispersal under the “restricted-kurtosis” prior scenario was 27.7m, with 25.6\% of dispersal events further than 100m, and 5.0\% greater than 500m (Fig. \ref{fig:dispersal}B). Values for other prior scenarios were very similar; although there were differences in the positions of the posterior distributions, the absolute differences in median dispersal distance and the number of long-distance mating events were small (Fig. \ref{fig:dispersal}C, \ref{fig:dispersal}D). There was very little variation in cumulative dispersal curves across iterations with different dispersal parameters, indicating that there was strong signal from genetic information about the shape of the dispersal kernel (Fig. \ref{fig:dispersal}B). These observations demonstrate that pollen dispersal in this sample was strongly leptokurtic, and that this finding is robust to specification about prior beliefs about dispersal and the proportion of missing fathers.
 
@@ -281,12 +284,6 @@ In this instance then, including a mixture component in the dispersal kernel red
 Over 1000 simulations the true father was identified as the most-probable candidate for 90.7\% of offspring when paternity is assessed in the absence of sibship or dispersal information (Fig. 4). This rises to 93.7\% when sibship information is included, and 97.1\% when both sibship and dispersal information are included. This demonstrates the value of performing a joint analysis of paternity, sibships and dispersal, and shows that our dataset has high power to identify the true fathers of individuals.
 
 \section{Discussion}
-
-\begin{figure}
-	\includegraphics[width=\linewidth]{bear.jpg} % Figure image
-	\caption{A majestic grizzly bear. This figure was in the stock latex template I used as an example of how to insert figures. It's not remotely relevant to the manuscript, but he brightens the place up, so I left him in for now. This also covers us in the event that a reviewer asks about bears as a pollination vector.}
-	\label{bear} % Label for referencing with \ref{bear}
-\end{figure}
 
 We have described a framework to jointly infer paternity, sibling relationships and populations parameters. Simulations showed that using all three sources of information leads to a substantial increase in statistical power to identify fathers correctly compared to using paternity, or paternity and sibship information alone. Applying this to a natural populations of snapdragons, we find strong evidence for a leptokurtic pollen-dispersal kernel, which is robust to prior assumptions about dispersal and sampling effort. In the following sections we discuss the implications of dispersal for the population, and caveats and future directions for the method.
 
