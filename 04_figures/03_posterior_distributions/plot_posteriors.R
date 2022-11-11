@@ -1,8 +1,5 @@
-#' Script to prepare MCMC output for plotting summaries of means and CIs.
-#' 
-#' This goes through folders of results from multiple MCMC analyses to pull out
-#' the full chain and summary files, and joins these. It then calculates means
-#' and 96% credible intervals for parameters of interest ready to be plotted.
+#' Script to calculte and plot posterior means and 96% credible intervals for 
+#' MCMC parameters
 
 library(tidyverse)
 library(ggpubr)
@@ -17,20 +14,9 @@ mcmc_results <- list.dirs("03_analysis/03_mcmc", recursive = FALSE) %>%
   select(mixture, scale, shape, scenario) %>% 
   pivot_longer(mixture : shape, names_to = "parameter")
 
-# Import summaries of mating events
-sm <- Sys.glob("03_analysis/04_mating_events/output/*/summarise_mating.csv")
-mating_summary <- lapply(sm, function(dir) {
-  read_csv(dir, col_types = 'dddddd') %>% 
-    mutate(scenario = strsplit(dir, split = "/")[[1]][[4]])
-})
-mating_summary <- do.call('rbind', mating_summary) %>% 
-  select(scenario, n_mating_events, orphans, median_dispersal, `dispersal>500m`) %>% 
-  rename(long_range_dispersal = `dispersal>500m`) %>% 
-  pivot_longer(n_mating_events : long_range_dispersal, names_to = "parameter")
 
-# Bind the two tables of results, and summarise means and CIs for each parameter
+# Summarise means and CIs for each parameter
 mcmc_summary <- mcmc_results %>% 
-  rbind(mating_summary) %>% 
   group_by(scenario, parameter) %>% 
   summarise(
     mean = mean(value),
@@ -62,3 +48,24 @@ plot_parameter <- function(p, ylab){
     ) +
     theme_bw()
 }
+
+
+plist <- list(
+  plot_parameter("shape", "Shape") + theme( axis.text.x = element_blank() ),
+  plot_parameter("mixture", "Mixture parameter")  + theme( axis.text.x = element_blank() ),
+  plot_parameter("scale", "Scale") + 
+    theme(
+      axis.text.x = element_text(angle = 90, hjust = 1, size = 8)
+      )
+)
+
+plot_posteriors <- ggarrange(plotlist = plist, ncol=1, heights = c(1,1,1.5), labels = 'AUTO')
+
+ggsave(
+  filename = "05_manuscript/posterior_distributions.eps",
+  plot = plot_posteriors,
+  device = "eps",
+  width = 8,
+  height = 22,
+  units = "cm"
+)
