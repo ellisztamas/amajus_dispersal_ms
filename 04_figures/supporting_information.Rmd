@@ -281,21 +281,21 @@ mean_me <- me %>%
   group_by(mother, array_size) %>% 
   summarise(
     n = (sum(prob) / length(unique(me$iter))),
-    n_plus_1 = n + 1,
+    # n_plus_1 = n + 1,
     .groups = "drop_last"
   ) %>% 
   ungroup()
 
 # Poisson GLM for the number of mating events as a function of the number of 
 # progeny in the maternal family.
-mod <- glm(n_plus_1 ~ -1 + array_size, data = mean_me, family = poisson)
+mod <- glm(n ~ array_size, data = mean_me, family = poisson)
 # Dataframe giving predicted number of mating events for maternal families of
 # 1 to 30 from the GLM
 pframe <- data.frame(
   array_size = 1:30
 ) %>% 
   mutate(
-    n = predict(mod, newdata = ., type = 'response') -1
+    n = predict(mod, newdata = ., type = 'response')
   )
 
 
@@ -334,6 +334,36 @@ me %>%
   ) +
   theme_bw() +
   theme(legend.position = "bottom")
+
+```
+
+```{r east-west-distance, fig.cap="Histogram of East-West distances between mother and father for each mating event, weighted by posterior probability of each mating event having occured. Postive values indicate the father is further West of the mother."}
+
+me %>% 
+  filter(!is.na(father)) %>% 
+  mutate(
+    eastwest = Easting_father - Easting_mother
+  ) %>%
+  ggplot( aes(x = eastwest, weights = prob) ) +
+  geom_histogram( aes(
+    y = stat(count / sum(count))
+    )) +
+  labs(
+    x = 'East-West distance from mother (m)',
+    y = "Density"
+    ) +
+  theme_bw()
+
+# me %>% 
+#   filter(!is.na(father)) %>% 
+#   mutate(
+#     eastwest = Easting_father - Easting_mother
+#   ) %>%
+#   mutate( direction = ifelse(eastwest > 0, 0, 1)) %>% 
+#   group_by(direction) %>% 
+#   summarise(
+#     n = sum(prob) / 1000,
+#   )
 
 ```
 
