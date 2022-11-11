@@ -234,13 +234,13 @@ For (2) and (3) we used FAPS to calculate the mean probability of paternity over
 
 \section{Results}
 
+\subsection{At least 200 full sibships}
+
 \begin{figure}
-\includegraphics{posterior_distributions.eps}
+\includegraphics{}
 \caption{Summaries of posterior distributions showing means and 96\% credible intervals.}
 \label{posterior_summaries}
 \end{figure}
-
-\subsection{At least 200 full sibships}
 
 Across prior dispersal scenarios, independent MCMC chains converged on the stationary and were generally well mixed (Fig. \ref{posterior_summaries}, Fig. SX, SX). The exception is when we set \textit{q} to 0.42, in which case chains took longer to converge, and tended to become stuck in local optima.
 
@@ -253,6 +253,12 @@ The GLM of the number of full sibships on maternal-family size revealed that log
 For all sixty mothers we found a mating event with non-zero probability for which the father one or more offspring was not sampled, including 44.5\% of the offspring. 93\% of these cases had posterior probabilities >0.99. Simulations indicated that the true number of mating events for which the father was not sampled was 108.2 on average (96\% credible intervals: 90, 127). Assuming the number of sampled fathers was 213 (Fig. 2D), this corresponds to approximately 33.6\% missing fathers (96\% credible intervals: 29.7, 37.4).
 
 \subsection{Pollen dispersal is leptokurtic}
+
+\begin{figure}
+\includegraphics{posterior_distributions.eps}
+\caption{Summaries of posterior distributions showing means and 96\% credible intervals.}
+\label{posterior_summaries}
+\end{figure}
 
 \begin{figure*}
     \centering
@@ -276,7 +282,7 @@ In this instance then, including a mixture component in the dispersal kernel red
 \subsection{Including dispersal information improves power to identify fathers}
 
 \begin{figure}
-    \includegraphics{simulations.png}
+    \includegraphics{simulations.eps}
     \caption{Simulation results. Plot shows the proportion of individuals for whom the true father was identified with probability $>0.99$ when paternity is inferred based on paternity of individuals only, on paternity and sibship information, and on from paternity, sibship and dispersal information combined.}
     \label{fig:simulations}
 \end{figure}
