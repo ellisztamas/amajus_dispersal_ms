@@ -42,8 +42,28 @@ p2 <- me %>%
   theme_bw()
 
 png(width = 16.9, height = 8, units = "cm", res = 600,
-  filename = "04_figures/02_mating_events/plot_mating_events.png"
+  filename = "05/plot_mating_events.png"
 )
 ggarrange(p1, p2, ncol = 2, labels = 'AUTO')
 
 dev.off()
+
+
+me %>% 
+  # Keep only mating events with a sampled father
+  filter( !is.na(father) ) %>% 
+  group_by(mother, father) %>% 
+  summarise(
+    sibship_size = sum(offspring) / 1000,
+    p = sum(prob) / 1000,
+    p_lower = quantile(prob, 0.02),
+    p_upper = quantile(prob, 0.98)
+  ) %>% 
+  ggplot(aes(y = p, x = sibship_size)) + 
+  geom_point() +
+  geom_errorbar( aes( ymin = p_lower, ymax = p_upper )) +
+  labs(
+    x = "Full-sibship size",
+    y = "Mean posterior probability"
+  ) +
+  theme_bw()

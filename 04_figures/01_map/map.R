@@ -4,7 +4,6 @@ library('tidyverse')
 
 gps <- read_csv("01_data/processed_GPS_positions.csv", col_types = 'cdd')
 
-
 map <- gps %>% 
   arrange(is_mother) %>% 
   mutate(
@@ -25,20 +24,11 @@ map <- gps %>%
     legend.title=element_blank()
   )
 
-# setEPS()
-# postscript(
-#   file = "04_figures/01_map/map.eps",
-#   width = 16.9/2.54,
-#   height = 10/2.54
-# )
-png(
-  filename = "04_figures/01_map/map.png",
-  units = "cm",
+ggsave(
+  filename = "05_manuscript/map.eps",
+  plot = map,
+  device = "eps",
   width = 16.9,
   height = 10,
-  res = 300
-)
-
-map
-
-dev.off()
+  units = "cm"
+  )

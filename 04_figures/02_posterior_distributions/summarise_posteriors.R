@@ -24,7 +24,7 @@ mating_summary <- lapply(sm, function(dir) {
     mutate(scenario = strsplit(dir, split = "/")[[1]][[4]])
 })
 mating_summary <- do.call('rbind', mating_summary) %>% 
-  select(scenario, n_mating_events, median_dispersal, `dispersal>500m`) %>% 
+  select(scenario, n_mating_events, orphans, median_dispersal, `dispersal>500m`) %>% 
   rename(long_range_dispersal = `dispersal>500m`) %>% 
   pivot_longer(n_mating_events : long_range_dispersal, names_to = "parameter")
 

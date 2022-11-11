@@ -63,12 +63,12 @@ plot_summaries <- ggarrange(plotlist = plist, ncol=1, heights = c(1,1.2), labels
 dispersal_plot <- ggarrange(inset_plot, plot_summaries, ncol = 2, widths = c(5,3))
 
 # Save to disk.
-ggsave(filename = "04_figures/03_dispersal/dispersal.png", 
+ggsave(filename = "05_manuscript/dispersal.eps", 
        plot = dispersal_plot,
        width = 169, 
        height = 120,
        units = "mm",
-       dpi = 300)
+       device = "eps")
   
 
 # log_dispersal <- me %>% 
