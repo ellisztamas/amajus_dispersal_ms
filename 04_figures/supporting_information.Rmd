@@ -1,0 +1,391 @@
+---
+title: "Supporting information"
+author: "Thomas James Ellis, David Luke Field, Nicholas H. Barton"
+date: ""
+output: pdf_document
+---
+
+```{r setup, message=FALSE, echo =FALSE }
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  cache = TRUE,
+  cache.lazy = TRUE
+)
+
+library(tidyverse)
+library(ggpubr)
+# library(kable)
+
+# This chunk sets up the prior simulations on dispersal parameters
+# See `03_analysis/02_prior_simulations/prior_simulations.Rmd` for more details
+source("02_library/R/prior_simulations.R")
+source("02_library/R/import_MCMC_results.R")
+
+set.seed(1204 )
+
+```
+
+```{r import-data, cache=TRUE}
+# Import all the MCMC results and concatenate into a single data.frame
+mcmc_results <- list.dirs("03_analysis/03_mcmc", recursive = FALSE) %>%
+  map(import_mcmc_results) %>%
+  do.call(what = "rbind") %>%
+  filter(iter > 500) %>% # Remove the first 500 iterations as burnin
+  # Change the names for each analysis to something human readable
+  mutate(
+    scenario = recode_factor(
+      scenario,
+      `01_mcmc_restrict_kurtosis` = "Restricted kurtosis",
+      `02_mcmc_short_range_kurtosis` = "Short-range dispersal",
+      `03_mcmc_strong_prior_on_kurtosis` = "Penalise kurtosis",
+      `04_mcmc_022_missing_fathers` = "Fewer missing fathers",
+      `05_mcmc_042_missing_fathers` = "More missing fathers",
+      `06_no_mixture` = "No mixture")
+  )
+
+# Import data table listing mating events
+me = read_csv(
+  "03_analysis/04_mating_events/output/01_mcmc_restrict_kurtosis/mating_events_over_chains.csv",
+  col_types = 'iccdddddd') %>% 
+  left_join( 
+    read_csv("01_data/maternal_family_sizes.csv", col_types = 'ci'), by = "mother"
+  ) %>% 
+  rename(array_size = n_offspring)
+```
+
+```{r run-prior-sims, cache=TRUE, cache.lazy=TRUE}
+# Set up simulations.
+x <- seq(1, 3000, 0.1) # vector of values from 0 to 3000 to draw from
+n_draws_per_sim <- 10000 # number of values to draw at each replicate
+nsims <- 1000 # number of replicate simulations to run
+
+# Mild skepticism about priors
+# Define hyperpriors
+restriced_kurtosis <- list(
+  shape = rgamma(shape=10, rate = 6,    n = nsims),
+  scale = rgamma(shape=6,  rate = 1/50, n = nsims),
+  sim   = NULL
+)
+# run the simulation
+restriced_kurtosis$sim  <- prior_sim(
+  x,
+  restriced_kurtosis$scale,
+  restriced_kurtosis$shape,
+  n = n_draws_per_sim
+)
+
+# Leptokurtosis, but at short range
+# Define hyperpriors
+short_range <- list(
+  shape = rgamma(shape=2, rate = 2,   n = nsims),
+  scale = rgamma(shape=2, rate = 1/3, n = nsims),
+  sim   = NULL
+)
+# run the simulation
+short_range$sim  <- prior_sim(
+  x,
+  short_range$scale,
+  short_range$shape,
+  n = n_draws_per_sim
+)
+
+# Strongly penalising leptokurtosis
+# Define hyperpriors
+penalise_kurtosis <- list(
+  shape = rgamma(shape=20, rate = 5,    n = nsims),
+  scale = rgamma(shape=6,  rate = 1/50, n = nsims),
+  sim   = NULL
+)
+# run the simulation
+penalise_kurtosis$sim  <- prior_sim(
+  x,
+  penalise_kurtosis$scale,
+  penalise_kurtosis$shape,
+  n = n_draws_per_sim
+)
+```
+
+```{r plot-prior-sims, fig.cap="Prior simulations. Histrograms show simulated values for the scale (A-C) and shape (D-F) parameters of the generalised normal distribution, with  and the dispersal distances those imply (G-I). Simulations are shown for three prior contrasting dispersal scenarios: (A,D,G) a model with moderate skepticism about leptokurtotic dispersal;  (B,E, H) a model allowing leptokurtosis, but skeptical of long-range dispersal; (C,F, I) a model highly skeptical of leptokurtosis. In A-F, Gamma priors on the shape and scale of the GND are giving, showing the shape and rate of the Gamma distribution. D-F also indicate the proportion of the prior mass on leptokurtotic distributions (when b<1). Each histogram is summed over 1000 replicate draws from Gamma priors."}
+
+par(mfrow=c(3,3), mar = c(4,4,1, 0))
+
+# Scale parameters
+hist(restriced_kurtosis$scale, breaks = 30,
+     main="Restricted kurtosis",
+     xlab = "Scale parameter",
+     ylab = "Prior density")
+legend('topright', bty='n', cex = c(1.2,1,1),
+       legend=c("A",
+                expression(paste(Gamma, "(6,1/50)"))
+       ))
+
+hist(short_range$scale, breaks = 30,
+     main="Short-range dispersal",
+     xlab = "Scale parameter",
+     ylab = "")
+legend('topright', bty='n', cex = c(1.2,1,1),
+       legend=c("B",
+                expression(paste(Gamma, "(2, 1/3)"))
+       ))
+
+hist(penalise_kurtosis$scale, breaks = 30,
+     main="Penalise kurtosis",
+     xlab = "Scale parameter",
+     ylab = "")
+legend('topright', bty='n', cex = c(1.2,1,1),
+       legend=c("C",
+                expression(paste(Gamma, "(6, 1/50)"))
+       ))
+
+# Shape parameters
+hist(restriced_kurtosis$shape, breaks = 30, xlim=c(0,4), ylim = c(0,120),
+     main="",
+     ylab = "Prior density",
+     xlab = "Shape parameter"
+)
+legend('topright', bty='n', cex = c(1.2,1,1),
+       legend=c("D",
+                expression(paste(Gamma, "(10, 6)")),
+                paste("Pr(b<1)=", round(mean(restriced_kurtosis$shape < 1), 2))
+       ))
+
+hist(short_range$shape, breaks = 30,
+     main="",
+     xlab = "Shape parameter",
+     ylab = "")
+legend('topright', bty='n', cex = c(1.2,1,1),
+       legend=c("E",
+                expression(paste(Gamma, "(2,2)")),
+                paste("Pr(b<1)=", round(mean(short_range$shape < 1), 2))
+       ))
+
+hist(penalise_kurtosis$shape, breaks = 30,
+     main="",
+     xlab = "Shape parameter",
+     ylab = "")
+legend('topright', bty='n', cex = c(1.2,1,1),
+       legend=c("F",
+                expression(paste(Gamma, "(20,5)")),
+                paste("Pr(b<1)=", round(mean(penalise_kurtosis$shape < 1), 2))
+       ))
+
+# Dispersal distances
+hist(restriced_kurtosis$sim$draws,
+     breaks = 30,
+     main="",
+     xlab = "Dispersal distance (m)",
+     ylab = "")
+legend('topright', bty='n', cex = c(1.2,1,1),
+       legend=c("G",
+                paste0("Median=", round(median(restriced_kurtosis$sim$draws), 2), "m")
+       ))
+
+hist(short_range$sim$draws, breaks = 30,
+     main="",
+     ylab = "",
+     xlab = "Dispersal distance (m)")
+legend('topright', bty='n', cex = c(1.2,1,1),
+       legend=c("H",
+                paste0("Median=", round(median(short_range$sim$draws), 2), "m")
+       ))
+hist(penalise_kurtosis$sim$draws, breaks = 30,
+     main="",
+     xlab = "Dispersal distance (m)",
+     ylab = ""
+)
+legend('topright', bty='n', cex = c(1.2,1,1),
+       legend=c("I",
+                paste0("Median=", round(median(penalise_kurtosis$sim$draws), 2), "m")
+       ))
+```
+
+```{r caterpillar-plots, fig.cap="Change in log posterior density over four independent MCMC chains for five dispersal scenarios. The first 500 iterations of each chain have been removed as burn-in.", fig.width=22/2.54}
+
+# Plot the change in log posterior through time
+mcmc_results %>%
+  ggplot(aes(x = iter, y = loglik, colour = chain, groups = chain)) +
+  geom_line() +
+  labs(
+    x = "Iteration",
+    y = "Log likelihood"
+  ) +
+  facet_grid(~ scenario) +
+  theme_bw() +
+  theme(
+    legend.position = "bottom",
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+```
+
+```{r posterior-histograms, fig.width=16.9/2.54, fig.height=20/2.54, fig.cap = "Posterior densities for the shape, scale and mixture parameters of the dispersal kernel. Histograms show stacked densities for each of four independent chains, for the five dispersal scenarios."}
+posterior_density <- list(
+  scale = mcmc_results %>%
+    filter(scenario != "No mixture") %>% 
+    ggplot(aes(x = scale, colour = chain, groups=chain, fill = chain)) +
+    geom_histogram() +
+    labs(
+      x = "Scale",
+      y = "Posterior density"
+    ) +
+    facet_grid( scenario ~ .) +
+    theme_bw() +
+    theme(
+      strip.text.y = element_blank()
+    ),
+  
+  shape = mcmc_results %>%
+    filter(scenario != "No mixture") %>% 
+    ggplot(aes(x = shape, colour = chain, groups=chain, fill = chain)) +
+    geom_histogram() +
+    labs(
+      x = "Shape",
+      y = ""
+    ) +
+    facet_grid( scenario ~ .)+
+    theme_bw() +
+    theme(
+      strip.text.y = element_blank()
+    ),
+  
+  mixture = mcmc_results %>%
+    filter(scenario != "No mixture") %>% 
+    ggplot(aes(x = mixture, colour = chain, groups=chain, fill = chain)) +
+    geom_histogram() +
+    labs(
+      x = "Mixture",
+      y = ""
+    ) +
+    facet_grid( scenario ~ .)+
+    theme_bw()
+)
+
+ggarrange(
+  plotlist = posterior_density,
+  ncol = 3,
+  common.legend = TRUE,
+  legend = "bottom"
+)
+
+```
+
+```{r nfamilies-vs-array-size, warning=FALSE, fig.cap="Number of paternal families as a function of total maternal array size. Data shown for the 'restricted-kurtosis' prior scenario and are averaged over 1000 iterations of the MCMC. Also plotted is curve predicted from a Poisson GLM of family number on array size, constrained to go through zero at the intercept."}
+# Average the probability of mating events having occurred over each iteration 
+# of the MCMC.
+mean_me <- me %>% 
+  # Keep only mating events with a sampled father, and with at least two offspring
+  # (offspring number is weighted by the probability of having occurred, so 
+  # this may be less than 1.)
+  filter(!is.na(father)) %>% 
+  # Average over iterations
+  group_by(mother, array_size) %>% 
+  summarise(
+    n = (sum(prob) / length(unique(me$iter))),
+    n_plus_1 = n + 1,
+    .groups = "drop_last"
+  ) %>% 
+  ungroup()
+
+# Poisson GLM for the number of mating events as a function of the number of 
+# progeny in the maternal family.
+mod <- glm(n_plus_1 ~ -1 + array_size, data = mean_me, family = poisson)
+# Dataframe giving predicted number of mating events for maternal families of
+# 1 to 30 from the GLM
+pframe <- data.frame(
+  array_size = 1:30
+) %>% 
+  mutate(
+    n = predict(mod, newdata = ., type = 'response') -1
+  )
+
+
+mean_me %>% 
+  ggplot( aes( x=array_size, y = n )) +
+  geom_point() +
+  geom_line(data = pframe, aes(x = array_size, y = n)) + 
+  labs(
+    x = "Maternal-array size",
+    y = "Number of paternal families"
+  ) +
+  theme_bw()
+
+```
+
+```{r prob-family-sizes, fig.cap="Posterior probabilities and sizes of paternal families. Each point shows the mean probability of a mating event between a mother and a single father averaged over 1000 MCMC iterations for the 'restricted-kurtosis' prior scenario, with 96% credible intervals. Colour indicates whether the father was in the sample of candidate or was unsampled. Note that individuals in families with unsampled fathers may consist of multiple paternal families."}
+# p2 <-
+me %>% 
+  # Keep only mating events with a sampled father
+  # filter( !is.na(father) ) %>%
+  # mutate(found_father = ifelse(is.na(father), "Sampled candidate", "Missing father")) %>% 
+  group_by(mother, father) %>% 
+  summarise(
+    sibship_size = sum(offspring) / 1000,
+    p = sum(prob) / 1000,
+    p_lower = quantile(prob, 0.02),
+    p_upper = quantile(prob, 0.98)
+  ) %>% 
+  mutate(Sire = ifelse(is.na(father), "Sampled candidate", "Missing father")) %>% 
+  ggplot(aes(y = p, x = sibship_size, colour = Sire)) + 
+  geom_point() +
+  geom_errorbar( aes( ymin = p_lower, ymax = p_upper )) +
+  labs(
+    x = "Paternal family size",
+    y = "Mean posterior probability"
+  ) +
+  theme_bw() +
+  theme(legend.position = "bottom")
+
+```
+
+
+```{r sd-gnd, fig.cap="Mean dispersal distances implied by the second moment of the generalised normal distribution based on scale and shape parameters from MCMC chains for six prior scenarios."}
+
+# Function to calculate the mean dispersal distance as the 2nd moment of the 
+# generalised normal distribution
+stdev_GND <- function(a,b){
+  sqrt(
+    (a^2 * gamma(3/b) ) / gamma(1/b)
+  )
+}
+
+# Function to plot means and credible intervals from the object created above.
+plot_parameter <- function(p, ylab){
+  mcmc_summary %>% 
+    filter(parameter == p) %>% 
+    ggplot(aes( y = mean, x = scenario)) +
+    geom_point() +
+    geom_errorbar(aes( ymin=lower, ymax=upper), width=0.1 ) +
+    labs(
+      x = element_blank(),
+      y = ylab
+    ) +
+    theme_bw()
+}
+
+mcmc_results$sd <- stdev_GND(mcmc_results$scale, mcmc_results$shape)
+
+mcmc_results %>%
+  group_by(scenario) %>% 
+  summarise(
+    mean = mean(sd),
+    lower = quantile(sd, 0.02),
+    upper = quantile(sd, 0.98)
+  ) %>% 
+  ggplot(aes( y = mean, x = scenario)) +
+    geom_point() +
+    geom_errorbar(aes( ymin=lower, ymax=upper), width=0.1 ) +
+    labs(
+      x = element_blank(),
+      y = "Mean dispersal distance (m)"
+    ) +
+    theme_bw() +
+    theme(
+      axis.text.x = element_text(angle = 90, hjust = 1, size = 8)
+    )
+
+  
+
+
+
+```
+

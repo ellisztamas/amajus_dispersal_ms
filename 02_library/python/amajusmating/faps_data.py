@@ -40,8 +40,8 @@ class faps_data(object):
 
         # Boolean matrix indicating when mothers (rows) have the same flower
         # colour as candidate fathers (columns).
-        maternal_colours  = self.flower_colours.loc[self.mothers].to_numpy()[:, np.newaxis]
-        candidate_colours = self.flower_colours.to_numpy()[np.newaxis]
+        maternal_colours  = self.flower_colours.loc[self.mothers]['simple_colour'].to_numpy()[:, np.newaxis]
+        candidate_colours = self.flower_colours['simple_colour'].to_numpy()[np.newaxis]
         self.matches = maternal_colours == candidate_colours
 
         # Empty dictionary to store probabilities for covariates

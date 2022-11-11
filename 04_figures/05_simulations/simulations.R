@@ -32,37 +32,3 @@ ggsave(
   units = "mm",
   device = "eps"
 )
-
-
-# sims %>% 
-#   mutate(
-#     paternity = exp(paternity),
-#     sibships  = exp(sibships),
-#     sibs_covs = exp(sibs_covs)
-#   )
-# 
-# 
-# 
-# sims %>% 
-#   pivot_longer(paternity:sibs_covs) %>% 
-#   mutate(
-#     value = exp(value),
-#     bin = cut(value,  breaks =c(0,0.1, 0.9, 0.95, 1, 1.1), right=FALSE)) %>% 
-#   group_by(iter, name, bin) %>% 
-#   summarise(
-#     n = n()
-#     ) %>%
-#   # group_by(iter, name) %>% 
-#   # summarise(
-#   #   n = sum(n)
-#   # ) %>%  pull(n) %>%  table
-#   group_by(name, bin) %>% 
-#   summarise(
-#     mean = mean(n),
-#     n = n()
-#   ) %>%
-#   ggplot( aes(x = bin, y = mean, group = name, colour = name) ) +
-#   geom_point() +
-#   geom_line()
-# 
-#          

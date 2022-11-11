@@ -1,0 +1,124 @@
+# Change log
+
+## Code for 3 figures
+
+Added code to plot the map, summaries of posterior distributinos with means and
+96% CIs,  and figures describing dispersal events (histogram, cumulative curve,
+summaries of median dispersal and sires >500m from the mother).
+
+Edited README to detail the function used to plot weighted cumulative curves.
+
+## Removed missing fathers from simulations
+
+3rd November 2022
+
+Removed the lines from simulation module that removes true fathers. I don't
+think it's doing what I think its doing, and it's not a priority to present.
+
+Added README for the simulations.
+
+## Plot mating events
+
+27th October 2022
+
+Added analysis and plots for the relationship between array size and number of
+sibships, and used this to infer the number of missing fathers.
+
+The latter is based on a GLM using mating events averaged over iterations. There
+is some funkiness with mating events with <2 offspring which I think I spurious.
+This might be worth repeating using a separate GLM for each iteration.
+
+## Power analysis simulations
+
+27th October 2022
+
+Added library code and script to run power analysis simulations.
+
+This simulates mating events between mothers and real candidate father
+genotypes, and generates families of full siblings of the same sizes as in 
+the real data set. This then runs FAPS functions on those data and returns
+probabilities of paternity for true sires based on paternity alone, after
+clustering into sibships, and after clustering including information about
+dispersal.
+
+It also returns the posterrior probs that true fathers were missing (1) when 
+they are really present and (2) when they are truly missing.
+
+
+## Many small changes
+
+27th October 2022
+
+- `setup_FAPS_GPS.py` changed to save GPS positions and maternal family sizes.
+ `02_library/python/amajusmating/mating.py` changed to include option to set
+    mixture to 1 by default. I should probably remove this and have scripts 
+    set this as necessary so this isn't implicit.
+- `README` updated to explain data formatting better.
+- `03_analysis/02_prior_simulations/prior_simulations.Rmd` small changes to text
+- `03_analysis/03_mcmc/01_mcmc_restrict_kurtosis/run_MCMC.py` small change to 
+    order scale before shape.
+`03_analysis/03_mcmc/job_submission.sh` updated to allow for a long job over 8 days
+`03_analysis/04_mating_events/get_mating_events.py` rearranged some arguments
+
+
+
+## Mating events
+7th October 2022
+Added files to infer mating events between individual mothers and pollen donors.
+
+## MCMC analyses
+7th October 2022
+Copied over existing MCMC scripts, and added two more testing different values
+for the proportion of missing fathers. Added a SLURM submission script and 
+sent to check it works on a cluster. Also added a README.
+
+## Prior simulations
+
+6th October 2022
+
+Added Rmd file for prior sims.
+
+## Initial commit
+
+6.10.22
+
+Initial commit of manuscript files.
+
+Copied data and library code from the working directory.
+
+Updated paths and added progress print statements in data formatting script.
+
+## 5.10.22
+
+I am setting up a folder to hold code for a manuscript repo. I want it to look 
+something like this:
+
+library:
+    data class
+    mcmc
+    dispersal
+    mating
+    simulations
+
+heavy lifting:
+    set-up script
+    mcmc in many flavours
+    mating patterns (list of mating events)
+        Need to check how I defined support for mating events - partitions or paternity?
+    simulations
+    signal from sibships vs covariates
+
+figures:
+    map
+    dispersal:
+        histogram
+        cumulative
+        show for flower colour separately?
+    simulations
+
+supplementary:
+    prior simulations
+    posterior output
+    anisotropy
+
+    
