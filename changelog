@@ -1,5 +1,32 @@
 # Change log
 
+## Supplementary figures
+
+11th Nov 2022
+
+Added supplementary figures.
+
+Moved plot of sibship probabilities to SI.
+
+Added sundry files I hadn't added before for some reason.
+
+## Updated main figures
+
+11th November 2022
+
+Moved distributions of number of mating events and proporting missing fathers
+to its own figure. Posterior plot now only summarises shape, scale and mixture.
+
+Changed numbering of other figures accordingly.
+
+## Latex manuscript
+
+10th November 2022
+
+Added files to create the manuscript. Tidied figure folders and changed these
+to output EPS figures to 05_manuscript so they are in the same place as the 
+.tex files.
+
 ## Code for 3 figures
 
 Added code to plot the map, summaries of posterior distributinos with means and

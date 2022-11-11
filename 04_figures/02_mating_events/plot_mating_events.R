@@ -66,6 +66,6 @@ plot_mating_events <- ggarrange(plot_n_mating_events, plot_missing_sires,
 ggsave(
   filename = "05_manuscript/mating_events.eps",
   device = "eps",
-  width = 8, height = 15,
+  width = 8, height = 15, units = "cm",
   plot = plot_mating_events
 )
