@@ -1,5 +1,15 @@
 # Change log
 
+## Removed estimate of missing fathers
+
+I realised the inference of the number of families with missing fathers was 
+dubious, and I don't trust the results. If necessary I can do something later
+with FAPS to address this.
+
+I removed this, and just included the raw estimates from FAPS (from 
+summarise_mating.csv files). I will put in the text that this is a lower bound, 
+because we don't know how many families there really are.
+
 ## Supplementary figures
 
 11th Nov 2022

@@ -1,7 +1,7 @@
 library(tidyverse)
 library(ggpubr)
 
-files <- Sys.glob("03_analysis/04_mating_events/output/*/missing_sires.csv")
+files <- Sys.glob("03_analysis/04_mating_events/output/*/summarise_mating.csv")
 
 # Import mating events from multiple scenarios
 mating_summary <- lapply(files, function(dir) {
@@ -11,7 +11,7 @@ mating_summary <- lapply(files, function(dir) {
   do.call(what = "rbind") %>% 
   # Calculate a proportion of missing sires
   mutate(
-    sim_missing_sires = sim_missing_sires / (sim_missing_sires + n_mating_events)
+    missing_dads = missing_dads / (missing_dads + n_mating_events)
   ) %>% 
   # Change the names for each analysis to something human readable
   mutate(
@@ -25,7 +25,7 @@ mating_summary <- lapply(files, function(dir) {
       `06_no_mixture` = "No mixture")
   ) %>% 
   # Get means and 96% credible intervals
-  pivot_longer(n_mating_events: sim_coef, names_to = "parameter") %>% 
+  pivot_longer(n_mating_events: orphans, names_to = "parameter") %>% 
   group_by(parameter, scenario) %>% 
   summarise(
     mean = mean(value),
@@ -47,7 +47,7 @@ plot_n_mating_events <- mating_summary %>%
   theme( axis.text.x = element_blank() )
 
 plot_missing_sires <- mating_summary %>% 
-  filter(parameter == "sim_missing_sires") %>% 
+  filter(parameter == "missing_dads") %>% 
   ggplot(aes( y = mean, x = scenario)) +
   geom_point() +
   geom_errorbar(aes( ymin=lower, ymax=upper), width=0.1 ) +
@@ -61,7 +61,7 @@ plot_missing_sires <- mating_summary %>%
   )
 
 plot_mating_events <- ggarrange(plot_n_mating_events, plot_missing_sires,
-          nrow = 2, heights = c(1,1.1), labels = "AUTO")
+          nrow = 2, heights = c(1,1.4), labels = "AUTO")
 
 ggsave(
   filename = "05_manuscript/mating_events.eps",
