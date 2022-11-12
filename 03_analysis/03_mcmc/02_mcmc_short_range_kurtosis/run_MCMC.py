@@ -18,8 +18,8 @@ from amajusmating import mcmc
 exec(open('03_analysis/01_data_formatting/setup_FAPS_GPS.py').read())
 
 # INITIALISE THE MODEL
-nreps = 40000 # Total number of iterations to run
-thin  = 100 # How often to write samples.
+nreps = 4000 # Total number of iterations to run
+thin  = 10 # How often to write samples.
 max_distance = np.inf # set a maximum dispersal distance
 # output_dir = "005.results/004_mcmc_restrict_kurtosis/output/"
 output_dir = os.path.dirname(os.path.abspath(__file__))+'/output/'
@@ -27,17 +27,14 @@ os.makedirs(output_dir, exist_ok=True)
 
 np.random.seed(1246)
 
-# Parameters for posterior simulations of mating
-ndraws = 1000
-burnin = 500
-spatial_bins = [-827, -70, 70, 244, 270, 560]
-
 # PRIORS
 priors = (lambda x : {
     'missing' : beta.pdf(x['missing'], a=3,   b=15),
     'mixture' : beta.pdf(x['mixture'], a=1.1, b=1.1),
     'shape'   : gamma.pdf(x['shape'],   a=2,  scale = 1/2),
-    'scale'   : gamma.pdf(x['scale'],   a=2,   scale = 3)
+    'scale'   : gamma.pdf(x['scale'],   a=2,   scale = 3),
+    'assortment' : beta.pdf(x['mixture'], a=1.1, b=1.1)
+
 })
 
 # Proposed values are a Gaussian peturbation away from the previous values.
@@ -47,6 +44,7 @@ proposal_sigma = {
     'shape'  : 0.05,
     'scale'  : 2,
     'mixture' : 0.025,
+    'assortment' : 0.025
 }
 
 for i in [1,2,3,4]:
@@ -56,7 +54,8 @@ for i in [1,2,3,4]:
             'missing' : [0.32,0.32,0.32,0.32] [i-1],
             'shape'   : [   2, 0.5, 0.2,   1] [i-1],
             'scale'   : [  70,  40, 100,  10] [i-1],
-            'mixture' : [0.99, 0.4, 0.8, 0.6] [i-1]
+            'mixture' : [0.99, 0.4, 0.8, 0.6] [i-1],
+            'assortment' : [ 0.8, 0.6, 0.2, 0.4] [i-1]
         },
         proposal_sigma = proposal_sigma,
         priors = priors,

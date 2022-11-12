@@ -14,12 +14,14 @@ Out of the box, this module will update variables
 Tom Ellis
 """
 
-import numpy as np
-import faps as fp
-from pprint import pprint
-from time import time, strftime
-from tqdm import tqdm
 import platform
+from pprint import pprint
+from time import strftime, time
+
+import faps as fp
+import numpy as np
+from tqdm import tqdm
+
 
 def check_parameters(model, sigma):
     """
@@ -61,6 +63,7 @@ def check_parameters(model, sigma):
     if "assortment" in model.keys():
         if model['assortment'] > 1.0 or model['assortment'] < 0:
             raise ValueError('"assortment" parameter should be between 0 and 1.')
+        model['null_assortment'] = np.nan
 
     output = dict(model)
     # set initial log probabilities to very small numbers
@@ -265,7 +268,13 @@ def run_MCMC(data, initial_parameters, proposal_sigma, priors, nreps, output_dir
             # UPDATE PARAMETERS
             new_model = update_parameters(current_model, proposal_sigma)
             data.update_covariate_probs(model=new_model, max_distance = max_distance)
-            
+            # If assortative mating is included in the MCMC, we also need the null
+            # assortment, or the probability of mating with the same type just via
+            # dispersal and random mating
+            if 'assortment' in initial_parameters:
+                null_assortment = data.covariates['dispersal'][data.matches]
+                new_model['null_assortment'] = np.exp(null_assortment).sum() / len(data.mothers)
+
             # INFER FAMILIES
              # Cluster into families and get likelihoods
             data.sibship_clustering(ndraws=100, use_covariates=True)

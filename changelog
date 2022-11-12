@@ -1,5 +1,17 @@
 # Change log
 
+## Added assortative mating back in
+
+12th November
+
+Added lines in the dictionaries for inital parameters and proposal sigmas to 
+include assortment in the MCMC analyses (most of the code to do that was there
+already, lurking behind if statements).
+
+I also added three lines to `check_parameters()` and `run_MCMC()` to include 
+an estimate of the 'null assortmemt', or the probability of mating between
+plants of the same type under random mating, given current dispersal parameters.
+
 ## Removed estimate of missing fathers
 
 I realised the inference of the number of families with missing fathers was 
