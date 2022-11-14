@@ -13,15 +13,14 @@ Out of the box, this module will update variables
 
 Tom Ellis
 """
-
+import numpy as np
 import platform
 from pprint import pprint
 from time import strftime, time
-
-import faps as fp
-import numpy as np
 from tqdm import tqdm
 
+import faps as fp
+from amajusmating import faps_data
 
 def check_parameters(model, sigma):
     """
@@ -219,12 +218,13 @@ def write_output(path, i, model, decimals = 3, time0=None):
         f.write(out + '\n')
     f.close()
 
-def run_MCMC(data, initial_parameters, proposal_sigma, priors, nreps, output_dir, chain_name, thin=1, max_distance = np.inf):
+def run_MCMC(data:faps_data, initial_parameters:dict, proposal_sigma:dict, priors:dict, nreps:int, output_dir:str, chain_name:str, thin:int=1, max_distance:float = np.inf):
         """
         A wrapper function to run Metropolis-Hastings MCMC for paternity and dispersal.
 
         Parameters
         ----------
+        data: 
         initial_parameters: dict
             Dictionary of starting values for the parameters, with the names as keys and 
             values as floats for the parameter values. Usually this would include the
@@ -272,8 +272,7 @@ def run_MCMC(data, initial_parameters, proposal_sigma, priors, nreps, output_dir
             # assortment, or the probability of mating with the same type just via
             # dispersal and random mating
             if 'assortment' in initial_parameters:
-                null_assortment = data.covariates['dispersal'][data.matches]
-                new_model['null_assortment'] = np.exp(null_assortment).sum() / len(data.mothers)
+                new_model['null_assortment'] = data.null_assortment(new_model)
 
             # INFER FAMILIES
              # Cluster into families and get likelihoods
@@ -290,6 +289,7 @@ def run_MCMC(data, initial_parameters, proposal_sigma, priors, nreps, output_dir
                 current = current_model['log_posterior'],
                 new     = new_model['log_posterior']
             )
+
             if accept:
                 current_model = new_model
 

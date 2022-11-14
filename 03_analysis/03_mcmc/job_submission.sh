@@ -3,9 +3,9 @@
 # SLURM
 #SBATCH --mem=10GB
 #SBATCH --output=./03_analysis/03_mcmc/log.txt
-#SBATCH --qos=long
-#SBATCH --time=8-00:00:00
-#SBATCH --array=0-4
+#SBATCH --qos=medium
+#SBATCH --time=1-00:00:00
+#SBATCH --array=0-6
 
 # ENVIRONMENT #
 module load build-env/2020

@@ -55,7 +55,7 @@ def dispersal_GND(x, scale, shape, w):
     assuming assuming he is either drawn at random form the
     population, or from a generalised normal function of his
     distance from each mother. The relative contribution of the
-    two distributions is controlled by mixture parameter c.
+    two distributions is controlled by mixture parameter w.
 
     Parameters
     ----------

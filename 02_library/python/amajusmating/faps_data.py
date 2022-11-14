@@ -8,11 +8,8 @@ There are also wrapper functions to simplify passing to internal FAPS objects.
 import numpy as np
 import pandas as pd
 import faps as fp
-from time import time, strftime
-from tqdm import tqdm
 
 from amajusmating import dispersal
-from amajusmating import mcmc
 
 class faps_data(object):
     def __init__(self, paternity, gps, flower_colours, params):
@@ -221,3 +218,31 @@ class faps_data(object):
         self.params['loglik'] = np.array([fp.alogsumexp(s.lik_partitions) for s in self.sibships.values()]).sum()
 
         return None
+
+    def null_assortment(self, model:dict):
+        """
+        Realised assortment under random mating
+        
+        If pollinators do not actively forage assortatively, there will still be
+        some degree of realised assortment due to spatial structure, meaning
+        similar genotypes are close to together and therefor easier to mate.
+        This function calculates the probability of mating events by summing
+        dispersal probabilities for candidates who match the phenotype of the 
+        mother only. This is done setting the 'weight' of the dispersal 
+        distribution to 1.
+
+        Parameters
+        ==========
+        model: dict
+            Dictionary of parameter names, containing float entries for the 
+            scale and shape parameters of the GND.
+        """
+        prob_distances = dispersal.dispersal_GND(
+            x = self.distances, 
+            scale = model['scale'],
+            shape = model['shape'],
+            w = 0.9
+        )
+        prob_distances = prob_distances[self.matches]
+
+        return np.exp(prob_distances).sum() / len(self.mothers)

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
 """
-Tom Ellis, 27th May 2021
+Tom Ellis, 18th October 2022
 
-Script to run joint analysis of paternity, sibships and dispersal using
-priors that are fairly skeptical about kurtosis (most of the prior mass on
-shape is between 1 and 3). This allows for a fair amount of dispersal up 
-to ~500m, but is skeptical about dispersal beyond that.
+Script to run joint analysis of paternity, sibships and dispersal without
+allowing for a mixture distribution for dispersal (i.e. fixing lambda to 1).
+
+Other dispersal priors are the same as the 'restricted kurtosis' priors.
 """
 import numpy as np
 import os
@@ -31,7 +31,7 @@ np.random.seed(87)
 # PRIORS
 priors = (lambda x : {
     'missing' : beta.pdf(x['missing'], a=3,   b=15),
-    'mixture' : beta.pdf(x['mixture'], a=1.1, b=1.1),
+    'mixture' : beta.pdf(x['mixture'], a=1,   b=1),
     'shape'   : gamma.pdf(x['shape'],  a=10,  scale = 1/5),
     'scale'   : gamma.pdf( x['scale'], a=6,   scale = 50),
     'assortment' : beta.pdf(x['assortment'], a=1.1, b=1.1)
@@ -41,9 +41,9 @@ priors = (lambda x : {
 # This is controlled by the sigma of the gaussian, which is defined for each variable
 proposal_sigma = {
     'missing' : 0.0,
-    'shape'  : 0.05,
-    'scale'  : 2,
-    'mixture' : 0.025,
+    'shape'   : 0.05,
+    'scale'   : 2,
+    'mixture' : 0,
     'assortment' : 0.025
 }
 
@@ -56,7 +56,7 @@ for i in [1,2,3,4]:
             'missing' : [0.32,0.32,0.32,0.32] [i-1],
             'shape'   : [   2, 0.5, 0.2,   1] [i-1],
             'scale'   : [  70,  40, 100,  10] [i-1],
-            'mixture' : [0.99, 0.4, 0.8, 0.6] [i-1],
+            'mixture' : [   1,   1,   1,   1] [i-1],
             'assortment' : [ 0.8, 0.6, 0.2, 0.4] [i-1]
         },
         proposal_sigma = proposal_sigma,

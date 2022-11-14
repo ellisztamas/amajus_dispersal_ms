@@ -35,7 +35,7 @@ priors = (lambda x : {
     'mixture' : beta.pdf(x['mixture'], a=1.1, b=1.1),
     'shape'   : gamma.pdf(x['shape'],   a=20,  scale = 1/5),
     'scale'   : gamma.pdf(x['scale'],   a=6,   scale = 50),
-    'assortment' : beta.pdf(x['mixture'], a=1.1, b=1.1)
+    'assortment' : beta.pdf(x['assortment'], a=1.1, b=1.1)
 })
 
 # Proposed values are a Gaussian peturbation away from the previous values.

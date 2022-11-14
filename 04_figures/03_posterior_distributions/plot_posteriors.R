@@ -11,8 +11,8 @@ mcmc_results <- list.dirs("03_analysis/03_mcmc", recursive = FALSE) %>%
   map(import_mcmc_results) %>%
   do.call(what = "rbind") %>%
   filter(iter > 500) %>% # Remove the first 500 iterations as burnin
-  select(mixture, scale, shape, scenario) %>% 
-  pivot_longer(mixture : shape, names_to = "parameter")
+  select(mixture, scale, shape, assortment, scenario) %>% 
+  pivot_longer(mixture : assortment, names_to = "parameter")
 
 
 # Summarise means and CIs for each parameter
@@ -53,13 +53,14 @@ plot_parameter <- function(p, ylab){
 plist <- list(
   plot_parameter("shape", "Shape") + theme( axis.text.x = element_blank() ),
   plot_parameter("mixture", "Mixture parameter")  + theme( axis.text.x = element_blank() ),
-  plot_parameter("scale", "Scale") + 
+  plot_parameter("scale", "Scale") + theme( axis.text.x = element_blank() ),
+  plot_parameter("assortment", "Assortment") + 
     theme(
       axis.text.x = element_text(angle = 90, hjust = 1, size = 8)
       )
 )
 
-plot_posteriors <- ggarrange(plotlist = plist, ncol=1, heights = c(1,1,1.5), labels = 'AUTO')
+plot_posteriors <- ggarrange(plotlist = plist, ncol=1, heights = c(1,1,1.2), labels = 'AUTO')
 
 ggsave(
   filename = "05_manuscript/posterior_distributions.eps",
