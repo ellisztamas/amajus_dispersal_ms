@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 
 """
-Tom Ellis, 27th May 2021
+Script to run joint analysis of paternity, sibships and dispersal by Metropolis-
+Hastings MCMC. This keeps the proportion of missing fathers fixed at 0.22 and
+allows lambda (the mixture parameter for dispersal) to vary.
 
-Script to run joint analysis of paternity, sibships and dispersal using
-priors that are fairly skeptical about kurtosis (most of the prior mass on
-shape is between 1 and 3). This allows for a fair amount of dispersal up 
-to ~500m, but is skeptical about dispersal beyond that.
+Tom Ellis, 3rd April 2023
 """
 import numpy as np
 import os
 from scipy.stats import beta
 from scipy.stats import gamma
+from scipy.stats import lognorm
 
 from amajusmating import mcmc
 
@@ -21,7 +21,7 @@ exec(open('03_analysis/01_data_formatting/setup_FAPS_GPS.py').read())
 # INITIALISE THE MODEL
 nreps = 40000 # Total number of iterations to run
 thin  = 100 # How often to write samples.
-max_distance = np.inf # set a maximum dispersal distance. Using `np.inf` sets no limit.
+max_distance = np.inf # set a maximum dispersal distance
 # output_dir = "005.results/004_mcmc_restrict_kurtosis/output/"
 output_dir = os.path.dirname(os.path.abspath(__file__))+'/output/'
 os.makedirs(output_dir, exist_ok=True)
@@ -32,8 +32,8 @@ np.random.seed(87)
 priors = (lambda x : {
     'missing' : beta.pdf(x['missing'], a=3,   b=15),
     'mixture' : beta.pdf(x['mixture'], a=1.1, b=1.1),
-    'shape'   : gamma.pdf(x['shape'],   a=10,  scale = 1/5),
-    'scale'   : gamma.pdf(x['scale'],   a=6,   scale = 50)
+    'shape'   : lognorm.pdf(x['shape'],  loc=0,  scale = 1/2),
+    'scale'   : gamma.pdf( x['scale'], a=6,   scale = 50)
 })
 
 # Proposed values are a Gaussian peturbation away from the previous values.

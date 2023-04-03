@@ -1,5 +1,34 @@
 # Change log
 
+## Simplify the priors
+
+3rd April 2023
+
+I previously presented three contrasting prior scenarios. I think this makes for
+a complicated presentation and doesn't really add much. I replaced this with a
+single set of less informative priors that place equal weight on leptokurtosis
+vs not. I will still keep the comparison with analyses using different values 
+for missing fathers, and keeping lambda fixed.
+
+I got this far, and submitted the MCMC job:
+- Update prior_sims.Rmd
+- Update prior sims in supplementary figures
+- Remove the old MCMC analyses and do it again.
+
+Still to do:
+- Repeat mating events based on new MCMC output
+- Repeat simulations based on new mating events
+- Update the supplementary figures with MCMC results
+- Update main figures
+- Fix the text
+
+## Relatedness
+
+January-ish 2023
+
+Attempted to see whether a linear measure of relatedness between parents
+explains anything about mating patterns. I don't think it does.
+
 ## Removed estimate of missing fathers
 
 I realised the inference of the number of families with missing fathers was 

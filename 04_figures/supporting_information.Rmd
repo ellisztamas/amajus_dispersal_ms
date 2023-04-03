@@ -62,149 +62,53 @@ nsims <- 1000 # number of replicate simulations to run
 
 # Mild skepticism about priors
 # Define hyperpriors
-restriced_kurtosis <- list(
-  shape = rgamma(shape=10, rate = 6,    n = nsims),
-  scale = rgamma(shape=6,  rate = 1/50, n = nsims),
+prior_values <- list(
+  scale = rgamma(shape=6, scale = 50, n = nsims),
+  shape = exp(rnorm(mean = 0, sd=0.5, n = nsims)),
   sim   = NULL
 )
+
 # run the simulation
-restriced_kurtosis$sim  <- prior_sim(
+prior_values$sim  <- prior_sim(
   x,
-  restriced_kurtosis$scale,
-  restriced_kurtosis$shape,
+  prior_values$scale,
+  prior_values$shape,
   n = n_draws_per_sim
 )
 
-# Leptokurtosis, but at short range
-# Define hyperpriors
-short_range <- list(
-  shape = rgamma(shape=2, rate = 2,   n = nsims),
-  scale = rgamma(shape=2, rate = 1/3, n = nsims),
-  sim   = NULL
-)
-# run the simulation
-short_range$sim  <- prior_sim(
-  x,
-  short_range$scale,
-  short_range$shape,
-  n = n_draws_per_sim
-)
-
-# Strongly penalising leptokurtosis
-# Define hyperpriors
-penalise_kurtosis <- list(
-  shape = rgamma(shape=20, rate = 5,    n = nsims),
-  scale = rgamma(shape=6,  rate = 1/50, n = nsims),
-  sim   = NULL
-)
-# run the simulation
-penalise_kurtosis$sim  <- prior_sim(
-  x,
-  penalise_kurtosis$scale,
-  penalise_kurtosis$shape,
-  n = n_draws_per_sim
-)
 ```
 
 ```{r plot-prior-sims, fig.cap="Prior simulations. Histrograms show simulated values for the scale (A-C) and shape (D-F) parameters of the generalised normal distribution, with  and the dispersal distances those imply (G-I). Simulations are shown for three prior contrasting dispersal scenarios: (A,D,G) a model with moderate skepticism about leptokurtotic dispersal;  (B,E, H) a model allowing leptokurtosis, but skeptical of long-range dispersal; (C,F, I) a model highly skeptical of leptokurtosis. In A-F, Gamma priors on the shape and scale of the GND are giving, showing the shape and rate of the Gamma distribution. D-F also indicate the proportion of the prior mass on leptokurtotic distributions (when b<1). Each histogram is summed over 1000 replicate draws from Gamma priors."}
 
-par(mfrow=c(3,3), mar = c(4,4,1, 0))
+par(mfrow=c(1,3) )#, mar = c(4,4,1, 0))
 
 # Scale parameters
-hist(restriced_kurtosis$scale, breaks = 30,
-     main="Restricted kurtosis",
+hist(prior_values$scale, breaks = 30,
+     main="Scale",
      xlab = "Scale parameter",
      ylab = "Prior density")
-legend('topright', bty='n', cex = c(1.2,1,1),
-       legend=c("A",
-                expression(paste(Gamma, "(6,1/50)"))
-       ))
-
-hist(short_range$scale, breaks = 30,
-     main="Short-range dispersal",
-     xlab = "Scale parameter",
-     ylab = "")
-legend('topright', bty='n', cex = c(1.2,1,1),
-       legend=c("B",
-                expression(paste(Gamma, "(2, 1/3)"))
-       ))
-
-hist(penalise_kurtosis$scale, breaks = 30,
-     main="Penalise kurtosis",
-     xlab = "Scale parameter",
-     ylab = "")
-legend('topright', bty='n', cex = c(1.2,1,1),
-       legend=c("C",
-                expression(paste(Gamma, "(6, 1/50)"))
-       ))
 
 # Shape parameters
-hist(restriced_kurtosis$shape, breaks = 30, xlim=c(0,4), ylim = c(0,120),
-     main="",
+hist(prior_values$shape, breaks = 30, xlim=c(0,4), ylim = c(0,120),
+     main="Shape",
      ylab = "Prior density",
      xlab = "Shape parameter"
 )
-legend('topright', bty='n', cex = c(1.2,1,1),
-       legend=c("D",
-                expression(paste(Gamma, "(10, 6)")),
-                paste("Pr(b<1)=", round(mean(restriced_kurtosis$shape < 1), 2))
-       ))
-
-hist(short_range$shape, breaks = 30,
-     main="",
-     xlab = "Shape parameter",
-     ylab = "")
-legend('topright', bty='n', cex = c(1.2,1,1),
-       legend=c("E",
-                expression(paste(Gamma, "(2,2)")),
-                paste("Pr(b<1)=", round(mean(short_range$shape < 1), 2))
-       ))
-
-hist(penalise_kurtosis$shape, breaks = 30,
-     main="",
-     xlab = "Shape parameter",
-     ylab = "")
-legend('topright', bty='n', cex = c(1.2,1,1),
-       legend=c("F",
-                expression(paste(Gamma, "(20,5)")),
-                paste("Pr(b<1)=", round(mean(penalise_kurtosis$shape < 1), 2))
-       ))
 
 # Dispersal distances
-hist(restriced_kurtosis$sim$draws,
+hist(prior_values$sim$draws,
      breaks = 30,
-     main="",
+     main="Inter-mate distances",
      xlab = "Dispersal distance (m)",
-     ylab = "")
-legend('topright', bty='n', cex = c(1.2,1,1),
-       legend=c("G",
-                paste0("Median=", round(median(restriced_kurtosis$sim$draws), 2), "m")
-       ))
+     ylab = "Prior density")
 
-hist(short_range$sim$draws, breaks = 30,
-     main="",
-     ylab = "",
-     xlab = "Dispersal distance (m)")
-legend('topright', bty='n', cex = c(1.2,1,1),
-       legend=c("H",
-                paste0("Median=", round(median(short_range$sim$draws), 2), "m")
-       ))
-hist(penalise_kurtosis$sim$draws, breaks = 30,
-     main="",
-     xlab = "Dispersal distance (m)",
-     ylab = ""
-)
-legend('topright', bty='n', cex = c(1.2,1,1),
-       legend=c("I",
-                paste0("Median=", round(median(penalise_kurtosis$sim$draws), 2), "m")
-       ))
 ```
 
 ```{r caterpillar-plots, fig.cap="Change in log posterior density over four independent MCMC chains for five dispersal scenarios. The first 500 iterations of each chain have been removed as burn-in.", fig.width=22/2.54}
 
 # Plot the change in log posterior through time
 mcmc_results %>%
-  ggplot(aes(x = iter, y = loglik, colour = chain, groups = chain)) +
+  ggplot(aes(x = iter, y = log_posterior, colour = chain, groups = chain)) +
   geom_line() +
   labs(
     x = "Iteration",

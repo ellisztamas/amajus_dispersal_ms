@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 
 """
-Tom Ellis, 27th May 2021
+Script to run joint analysis of paternity, sibships and dispersal by Metropolis-
+Hastings MCMC. This keeps the proportion of missing fathers fixed at 0.32 and
+allows lambda (the mixture parameter for dispersal) to vary.
 
-Script to run joint analysis of paternity, sibships and dispersal using
-priors that are fairly skeptical about kurtosis (most of the prior mass on
-shape is between 1 and 3). This allows for a fair amount of dispersal up 
-to ~500m, but is skeptical about dispersal beyond that.
+Tom Ellis, 3rd April 2023
 """
 import numpy as np
 import os
 from scipy.stats import beta
 from scipy.stats import gamma
+from scipy.stats import lognorm
 
 from amajusmating import mcmc
 
@@ -32,7 +32,7 @@ np.random.seed(87)
 priors = (lambda x : {
     'missing' : beta.pdf(x['missing'], a=3,   b=15),
     'mixture' : beta.pdf(x['mixture'], a=1.1, b=1.1),
-    'shape'   : gamma.pdf(x['shape'],  a=10,  scale = 1/5),
+    'shape'   : lognorm.pdf(x['shape'],  loc=0,  scale = 1/2),
     'scale'   : gamma.pdf( x['scale'], a=6,   scale = 50)
 })
 
