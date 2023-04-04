@@ -2,7 +2,7 @@
 
 """
 Script to run joint analysis of paternity, sibships and dispersal by Metropolis-
-Hastings MCMC. This keeps the proportion of missing fathers fixed at 0.32 and
+Hastings MCMC. This keeps the proportion of missing fathers fixed at 0.42 and
 allows lambda (the mixture parameter for dispersal) to vary.
 
 Tom Ellis, 3rd April 2023
@@ -32,7 +32,7 @@ np.random.seed(87)
 priors = (lambda x : {
     'missing' : beta.pdf(x['missing'], a=3,   b=15),
     'mixture' : beta.pdf(x['mixture'], a=1.1, b=1.1),
-    'shape'   : lognorm.pdf(x['shape'],  loc=0,  scale = 1/2),
+    'shape'   : lognorm.pdf(x['shape'],  scale=1,  s = 0.5),
     'scale'   : gamma.pdf( x['scale'], a=6,   scale = 50)
 })
 
