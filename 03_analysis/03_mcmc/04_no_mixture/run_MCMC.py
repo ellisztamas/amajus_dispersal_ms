@@ -31,7 +31,7 @@ np.random.seed(87)
 # PRIORS
 priors = (lambda x : {
     'missing' : beta.pdf(x['missing'], a=3,   b=15),
-    'mixture' : beta.pdf(x['mixture'], a=1.1, b=1.1),
+    'mixture' : 1, # In this analysis lambda is fixed to one, so the prior doesn't change
     'shape'   : lognorm.pdf(x['shape'],  scale=1,  s = 0.5),
     'scale'   : gamma.pdf( x['scale'], a=6,   scale = 50)
 })
@@ -48,7 +48,7 @@ proposal_sigma = {
 
 print("\nBeginning MCMC.\n\n")
 
-for i in [4]:
+for i in [1,2,3,4]:
     mcmc.run_MCMC(
         data= am_data,
         initial_parameters = {
