@@ -6,8 +6,8 @@
 #SBATCH --output=./03_analysis/03_mcmc/mcmc_jobs.%J.out
 #SBATCH --error=./03_analysis/03_mcmc/mcmc_jobs.%J.err
 #SBATCH --qos=long
-#SBATCH --time=4-00:00:00
-#SBATCH --array=0-4
+#SBATCH --time=6-00:00:00
+#SBATCH --array=0-3
 
 # ENVIRONMENT #
 module load build-env/2020

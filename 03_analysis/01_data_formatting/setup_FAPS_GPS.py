@@ -26,7 +26,7 @@ print(
 
 # GENOTYPE DATA
 # Genotyping error rate.
-mu=0.0013
+mu=0.0001
 # Import genpotype data
 print("Importing genotype data.")
 progeny = fp.read_genotypes('01_data/offspring_2012_genotypes.csv', mothers_col=1, genotype_col=2)

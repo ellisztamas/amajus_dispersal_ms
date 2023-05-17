@@ -1,5 +1,13 @@
 # Change log
 
+## MCMC with simplified priors
+
+17th May 2023
+
+Ran the MCMC jobs with simpler priors.
+For the analysis with mixture set to 1 I had to change the beta prior to a 
+fixed value, or else the log posterior came back as undefined.
+
 ## Simplify the priors
 
 3rd April 2023
