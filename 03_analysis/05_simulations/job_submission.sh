@@ -2,9 +2,10 @@
 
 # SLURM
 #SBATCH --mem=10GB
+#SBATCH --name=amajus_simulations
 #SBATCH --qos=medium
 #SBATCH --output=./03_analysis/05_simulations/log.txt
-#SBATCH --time=8:00:00
+#SBATCH --time=2-00:00:00
 
 # ENVIRONMENT #
 # module load build-env/2020
