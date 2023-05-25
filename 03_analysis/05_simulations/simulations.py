@@ -57,7 +57,7 @@ for i in tqdm(mcmc.index):
     
     # Remove a proportion of the true fathers and see how this affects paternity assignments.
     # See amajus.sims.missing_fathers for details of the output.
-    missing_dads = [sim.simulate_missing_fathers(sim_progeny, patlik, q) for q in [0.1, 0.2, 0.3, 0.4, 0.5] ]
+    missing_dads = [sim.simulate_missing_fathers(am_data, sim_progeny, patlik, q) for q in [0.1, 0.2, 0.3, 0.4, 0.5] ]
     missing_dads = pd.DataFrame(missing_dads)
     missing_dads.insert(loc=0, column='iter', value=i) # add a column giving the iteration label.
     # Write to disk

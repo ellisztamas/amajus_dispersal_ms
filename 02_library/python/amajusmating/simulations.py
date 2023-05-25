@@ -224,7 +224,7 @@ def compare_paternity_accuracy(progeny, paternity_array, genotypes):
 
     return output
 
-def simulate_missing_fathers(progeny, paternity_array, q):
+def simulate_missing_fathers(data, progeny, paternity_array, q):
     """
     Remove a subset of real fathers from a paternityArray object and see what 
     happens to the paternity of the offspring.
@@ -235,6 +235,8 @@ def simulate_missing_fathers(progeny, paternity_array, q):
 
     Parameters
     ==========
+    data: `faps_data` class object
+        Data about the population.
     progeny: faps.genotypeArray object
         Genotype data on a set of progeny
     paternity_array: faps.paternityArray object
@@ -298,9 +300,9 @@ def simulate_missing_fathers(progeny, paternity_array, q):
     # Calculate weighted median distances for full and purged data
     # Create a data frame of distances we can join on.
     distance_df = pd.DataFrame({
-        'mother'   : np.repeat(list(am_data.mothers), am_data.n_candidates),
-        'father'   : np.tile(am_data.candidates, len(am_data.mothers)),
-        'distance' : am_data.distances.flatten()
+        'mother'   : np.repeat(list(data.mothers), data.n_candidates),
+        'father'   : np.tile(data.candidates, len(data.mothers)),
+        'distance' : data.distances.flatten()
     })
     # Merge siring events with distances and phenotypes
     median_distance_real = me_combined.\
