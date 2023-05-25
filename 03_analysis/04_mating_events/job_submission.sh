@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # SLURM
+#SBATCH --name=mating_events
 #SBATCH --mem=10GB
 #SBATCH --qos=medium
 #SBATCH --output=./03_analysis/04_mating_events/log.txt

@@ -2,7 +2,7 @@
 
 # SLURM
 #SBATCH --mem=10GB
-#SBATCH --name=amajus_simulations
+#SBATCH --job-name=amajus_simulations
 #SBATCH --qos=medium
 #SBATCH --output=./03_analysis/05_simulations/log.txt
 #SBATCH --time=2-00:00:00
