@@ -42,9 +42,8 @@ proposal_sigma = {
     'missing' : 0.0,
     'shape'   : 0.05,
     'scale'   : 2,
-    'mixture' : 0,
-    'assortment' : 0.025
-}
+    'mixture' : 0
+    }
 
 print("\nBeginning MCMC.\n\n")
 
@@ -55,8 +54,7 @@ for i in [1,2,3,4]:
             'missing' : [0.32,0.32,0.32,0.32] [i-1],
             'shape'   : [   2, 0.5, 0.2,   1] [i-1],
             'scale'   : [  70,  40, 100,  10] [i-1],
-            'mixture' : [   1,   1,   1,   1] [i-1],
-            'assortment' : [ 0.8, 0.6, 0.2, 0.4] [i-1]
+            'mixture' : [   1,   1,   1,   1] [i-1]
         },
         proposal_sigma = proposal_sigma,
         priors = priors,

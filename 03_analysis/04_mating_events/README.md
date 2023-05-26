@@ -1,5 +1,16 @@
 Python scripts to infer mating events between mothers and individual pollen
-donors. This is done for the output of the MCMC analysis in
+donors.
+
+This is done in two ways:
+1. Including dispersal information from the MCMC output
+2. Based on genetics only.
+
+`job_submission.sh` is a bash script that runs the mating script on each MCMC
+output, and submits this as a job array to SLURM.
+
+## Using covariates
+
+This is done for the output of the MCMC analysis in
 `03_analysis/03_mcmc/01_mcmc_restrict_kurtosis/`. This takes each of the four
 chains, discards the first 1500 iterations as burn-in, and infers mating events
 based on dispersal parameters for each of the 1000 remaining iterations.
@@ -13,6 +24,8 @@ probability of that structure. The probability of a mating event between the
 mother and an individual candidate father is then the sum of those 
 probabilities for each partition structure in which he appears.
 
+## Output
+
 `get_mating_events()` generates a file giving mating events between each mother
 and plausible fathers for each iteration separately. This shows:
 
@@ -24,6 +37,3 @@ and plausible fathers for each iteration separately. This shows:
 
 `get_mating_events()` also generates a table summarising mating events for each
 iteration.
-
-`job_submission.sh` is a bash script that runs the mating script on each MCMC
-output, and submits this as a job array to SLURM.
