@@ -13,6 +13,7 @@ me <-read_csv(
 
 # Histogram of disperal distances
 linear_dispersal <- me %>% 
+  filter( offspring > 1 ) %>% 
   mutate(iter = as.factor(iter)) %>% 
   ggplot( aes(x = distance, weights = prob) ) +
   geom_histogram(aes(
@@ -29,6 +30,7 @@ linear_dispersal <- me %>%
 # Log cumulative distribution of disperal distances.
 log_dispersal <- me %>% 
   mutate(iter = as.factor(iter)) %>% 
+  filter( offspring > 1 ) %>% 
   ggplot( aes(x = distance, weights = prob, groups = iter) ) +
   stat_ecdf(
     geom = "step",

@@ -3,6 +3,10 @@ library(ggpubr)
 
 files <- Sys.glob("03_analysis/04_mating_events/output/*/summarise_mating.csv")
 
+me <- read_csv("03_analysis/04_mating_events/output/01_mcmc_main/summarise_mating.csv")
+
+me
+
 # Import mating events from multiple scenarios
 mating_summary <- lapply(files, function(dir) {
   read_csv(dir, col_types = 'dddddd') %>%
@@ -17,12 +21,11 @@ mating_summary <- lapply(files, function(dir) {
   mutate(
     scenario = recode_factor(
       scenario,
-      `01_mcmc_restrict_kurtosis` = "Restricted kurtosis",
-      `02_mcmc_short_range_kurtosis` = "Short-range dispersal",
-      `03_mcmc_strong_prior_on_kurtosis` = "Penalise kurtosis",
-      `04_mcmc_022_missing_fathers` = "Fewer missing fathers",
-      `05_mcmc_042_missing_fathers` = "More missing fathers",
-      `06_no_mixture` = "No mixture")
+      `02_mcmc_022_missing_fathers` = "q=0.22",
+      `01_mcmc_main` = "q=0.32",
+      `03_mcmc_042_missing_fathers` = "q=0.42"#,
+      # `04_no_mixture` = "No mixture"
+      )
   ) %>% 
   # Get means and 96% credible intervals
   pivot_longer(n_mating_events: orphans, names_to = "parameter") %>% 

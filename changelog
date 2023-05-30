@@ -1,5 +1,21 @@
 # Change log
 
+## Simulations with missing fathers
+
+25th May 2023
+
+Added function to remove a sample of real fathers from simulated data and
+see what happens to paternity assignment of the offspring. This calculates how
+many offspring are affected, how many are correctly assigned as having missing 
+dads, and how many are falsely assigned to families of size = 1.
+
+This splits up the original simulation function to first generate the genotype
+data and calculate a paternity array, then use separate functions to calculate
+paternity accuracy (what the previous simulations were doing) and do the stuff
+with missing dads.
+
+This is done for only 200 iterations of the MCMC, because this will be much slower.
+
 ## MCMC with simplified priors
 
 17th May 2023

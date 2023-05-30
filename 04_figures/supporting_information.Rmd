@@ -28,7 +28,7 @@ set.seed(1204 )
 
 ```{r import-data, cache=TRUE}
 # Import all the MCMC results and concatenate into a single data.frame
-mcmc_results <- list.dirs("03_analysis/03_mcmc", recursive = FALSE) %>%
+mcmc_results <- list.dirs("03_analysis/03_mcmc", recursive = FALSE)[-4] %>%
   map(import_mcmc_results) %>%
   do.call(what = "rbind") %>%
   filter(iter > 500) %>% # Remove the first 500 iterations as burnin
@@ -36,17 +36,16 @@ mcmc_results <- list.dirs("03_analysis/03_mcmc", recursive = FALSE) %>%
   mutate(
     scenario = recode_factor(
       scenario,
-      `01_mcmc_restrict_kurtosis` = "Restricted kurtosis",
-      `02_mcmc_short_range_kurtosis` = "Short-range dispersal",
-      `03_mcmc_strong_prior_on_kurtosis` = "Penalise kurtosis",
-      `04_mcmc_022_missing_fathers` = "Fewer missing fathers",
-      `05_mcmc_042_missing_fathers` = "More missing fathers",
-      `06_no_mixture` = "No mixture")
+      `02_mcmc_022_missing_fathers` = "q=0.22",
+      `01_mcmc_main` = "q=0.32",
+      `03_mcmc_042_missing_fathers` = "q=0.42"#,
+      # `04_no_mixture` = "No mixture"
+      )
   )
 
 # Import data table listing mating events
 me = read_csv(
-  "03_analysis/04_mating_events/output/01_mcmc_restrict_kurtosis/mating_events_over_chains.csv",
+  "03_analysis/04_mating_events/output/01_mcmc_main/mating_events_over_chains.csv",
   col_types = 'iccdddddd') %>% 
   left_join( 
     read_csv("01_data/maternal_family_sizes.csv", col_types = 'ci'), by = "mother"
@@ -112,7 +111,7 @@ mcmc_results %>%
   geom_line() +
   labs(
     x = "Iteration",
-    y = "Log likelihood"
+    y = "Log posterior"
   ) +
   facet_grid(~ scenario) +
   theme_bw() +
@@ -216,19 +215,23 @@ mean_me %>%
 ```
 
 ```{r prob-family-sizes, fig.cap="Posterior probabilities and sizes of paternal families. Each point shows the mean probability of a mating event between a mother and a single father averaged over 1000 MCMC iterations for the 'restricted-kurtosis' prior scenario, with 96% credible intervals. Colour indicates whether the father was in the sample of candidate or was unsampled. Note that individuals in families with unsampled fathers may consist of multiple paternal families."}
+
+n_iter <- length(unique(me$iter))
+
 # p2 <-
+
 me %>% 
   # Keep only mating events with a sampled father
   # filter( !is.na(father) ) %>%
   # mutate(found_father = ifelse(is.na(father), "Sampled candidate", "Missing father")) %>% 
   group_by(mother, father) %>% 
   summarise(
-    sibship_size = sum(offspring) / 1000,
-    p = sum(prob) / 1000,
+    sibship_size = sum(offspring) / n_iter,
+    p = sum(prob) / n_iter,
     p_lower = quantile(prob, 0.02),
     p_upper = quantile(prob, 0.98)
   ) %>% 
-  mutate(Sire = ifelse(is.na(father), "Sampled candidate", "Missing father")) %>% 
+  mutate(Sire = ifelse( is.na(father), "Missing father", "Sampled candidate")) %>% 
   ggplot(aes(y = p, x = sibship_size, colour = Sire)) + 
   geom_point() +
   geom_errorbar( aes( ymin = p_lower, ymax = p_upper )) +
@@ -239,6 +242,26 @@ me %>%
   theme_bw() +
   theme(legend.position = "bottom")
 
+me %>% 
+  mutate(Sire = ifelse(is.na(father), "Missing father", "Sampled candidate")) %>% 
+  ggplot( aes(x = offspring, weights = prob, group=Sire, colour=Sire) ) +
+  stat_ecdf(
+    geom = "step",
+    pad = FALSE
+  )
+
+me %>% group_by(mother, father) %>% 
+  summarise(
+    sibship_size = sum(offspring) / n_iter,
+    p = sum(prob) / n_iter,
+    p_lower = quantile(prob, 0.02),
+    p_upper = quantile(prob, 0.98)
+  ) %>% 
+  mutate(Sire = ifelse( is.na(father), "Missing father", "Sampled candidate")) %>% 
+  ggplot(aes(x = sibship_size, group=Sire, fill=Sire)) + 
+  geom_histogram(binwidth = 1)
+
+  
 ```
 
 ```{r east-west-distance, fig.cap="Histogram of East-West distances between mother and father for each mating event, weighted by posterior probability of each mating event having occured. Postive values indicate the father is further West of the mother."}

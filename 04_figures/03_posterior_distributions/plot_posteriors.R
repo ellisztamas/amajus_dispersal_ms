@@ -7,7 +7,7 @@ library(ggpubr)
 source("02_library/R/import_MCMC_results.R")
 
 # Import all the MCMC results and concatenate into a single data.frame
-mcmc_results <- list.dirs("03_analysis/03_mcmc", recursive = FALSE) %>%
+mcmc_results <- list.dirs("03_analysis/03_mcmc", recursive = FALSE)[-4] %>%
   map(import_mcmc_results) %>%
   do.call(what = "rbind") %>%
   filter(iter > 500) %>% # Remove the first 500 iterations as burnin
@@ -16,7 +16,7 @@ mcmc_results <- list.dirs("03_analysis/03_mcmc", recursive = FALSE) %>%
 
 
 # Summarise means and CIs for each parameter
-mcmc_summary <- mcmc_results %>% 
+mcmc_summary <-mcmc_results %>% 
   group_by(scenario, parameter) %>% 
   summarise(
     mean = mean(value),
@@ -27,12 +27,11 @@ mcmc_summary <- mcmc_results %>%
   mutate(
     scenario = recode_factor(
       scenario,
-      `01_mcmc_restrict_kurtosis` = "Restricted\nkurtosis",
-      `02_mcmc_short_range_kurtosis` = "Short-range\ndispersal",
-      `03_mcmc_strong_prior_on_kurtosis` = "Penalise\nkurtosis",
-      `04_mcmc_022_missing_fathers` = "Fewer missing\nfathers",
-      `05_mcmc_042_missing_fathers` = "More missing\nfathers",
-      `06_no_mixture` = "No mixture")
+      `02_mcmc_022_missing_fathers` = "q=0.22",
+      `01_mcmc_main` = "q=0.32",
+      `03_mcmc_042_missing_fathers` = "q=0.42"#,
+      # `04_no_mixture` = "No mixture"
+      )
   )
 
 # Function to plot means and credible intervals from the object created above.
@@ -51,9 +50,9 @@ plot_parameter <- function(p, ylab){
 
 
 plist <- list(
+  plot_parameter("scale", "Scale") + theme( axis.text.x = element_blank() ),
   plot_parameter("shape", "Shape") + theme( axis.text.x = element_blank() ),
-  plot_parameter("mixture", "Mixture parameter")  + theme( axis.text.x = element_blank() ),
-  plot_parameter("scale", "Scale") + 
+  plot_parameter("mixture", "Mixture parameter") +
     theme(
       axis.text.x = element_text(angle = 90, hjust = 1, size = 8)
       )
