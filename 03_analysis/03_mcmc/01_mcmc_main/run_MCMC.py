@@ -12,8 +12,13 @@ import os
 from scipy.stats import beta
 from scipy.stats import gamma
 from scipy.stats import lognorm
+import argparse
 
 from amajusmating import mcmc
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-i', required = True)
+args = parser.parse_args()
 
 # FAPS objects and distance matrices are generated in a separate script.
 exec(open('03_analysis/01_data_formatting/setup_FAPS_GPS.py').read())
@@ -22,7 +27,6 @@ exec(open('03_analysis/01_data_formatting/setup_FAPS_GPS.py').read())
 nreps = 40000 # Total number of iterations to run
 thin  = 100 # How often to write samples.
 max_distance = np.inf # set a maximum dispersal distance
-# output_dir = "005.results/004_mcmc_restrict_kurtosis/output/"
 output_dir = os.path.dirname(os.path.abspath(__file__))+'/output/'
 os.makedirs(output_dir, exist_ok=True)
 
@@ -47,20 +51,20 @@ proposal_sigma = {
 
 print("\nBeginning MCMC.\n\n")
 
-for i in [1,2,3,4]:
-    mcmc.run_MCMC(
-        data= am_data,
-        initial_parameters = {
-            'missing' : [0.32,0.32,0.32,0.32] [i-1],
-            'shape'   : [   2, 0.5, 0.2,   1] [i-1],
-            'scale'   : [  70,  40, 100,  10] [i-1],
-            'mixture' : [0.99, 0.4, 0.8, 0.6] [i-1]
-        },
-        proposal_sigma = proposal_sigma,
-        priors = priors,
-        thin=thin,
-        nreps=nreps,
-        output_dir = output_dir,
-        chain_name = 'chain' + str(i),
-        max_distance = max_distance
-        )
+i = args.i
+mcmc.run_MCMC(
+    data= am_data,
+    initial_parameters = {
+        'missing' : [ 0.5, 0.5, 0.5, 0.5] [i-1],
+        'shape'   : [   2, 0.5, 0.2,   1] [i-1],
+        'scale'   : [  70,  40, 100,  10] [i-1],
+        'mixture' : [0.99, 0.4, 0.8, 0.6] [i-1]
+    },
+    proposal_sigma = proposal_sigma,
+    priors = priors,
+    thin=thin,
+    nreps=nreps,
+    output_dir = output_dir,
+    chain_name = 'chain' + str(i),
+    max_distance = max_distance
+    )
