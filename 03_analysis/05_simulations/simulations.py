@@ -26,7 +26,7 @@ input_dir = "03_analysis/03_mcmc/01_mcmc_main/output/"
 mcmc = import_mcmc(input_dir, burnin=burnin)
 # Just use 200 random iterations from the MCMC
 ix = np.sort( np.random.random_integers(0,mcmc.shape[0], 200) )
-mcmc = mcmc.iloc[ix, :]
+mcmc = mcmc.iloc[ix, :].reset_index()
 
 # File to output the results.
 output_dir = "03_analysis/05_simulations"
@@ -62,5 +62,5 @@ for i in tqdm(mcmc.index):
     missing_dads.insert(loc=0, column='iter', value=i) # add a column giving the iteration label.
     # Write to disk
     with open(output_dir + "/missing_fathers.csv", 'a') as f:
-        accuracy.to_csv(f, mode='a', header=f.tell()==0, float_format='%.4f', index=False)
+        missing_dads.to_csv(f, mode='a', header=f.tell()==0, float_format='%.4f', index=False)
     
