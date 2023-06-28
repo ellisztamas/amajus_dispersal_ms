@@ -2,7 +2,7 @@
 
 """
 Script to run joint analysis of paternity, sibships and dispersal by Metropolis-
-Hastings MCMC. This keeps the proportion of missing fathers fixed at 0.32 and
+Hastings MCMC. This keeps the proportion of missing fathers fixed at 0.5 and
 lambda (the mixture parameter for dispersal) fixed at one.
 
 Tom Ellis, 3rd April 2023
@@ -12,8 +12,13 @@ import os
 from scipy.stats import beta
 from scipy.stats import gamma
 from scipy.stats import lognorm
+import argparse
 
 from amajusmating import mcmc
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-i', required = True, type=int)
+args = parser.parse_args()
 
 # FAPS objects and distance matrices are generated in a separate script.
 exec(open('03_analysis/01_data_formatting/setup_FAPS_GPS.py').read())
@@ -22,7 +27,6 @@ exec(open('03_analysis/01_data_formatting/setup_FAPS_GPS.py').read())
 nreps = 40000 # Total number of iterations to run
 thin  = 100 # How often to write samples.
 max_distance = np.inf # set a maximum dispersal distance
-# output_dir = "005.results/004_mcmc_restrict_kurtosis/output/"
 output_dir = os.path.dirname(os.path.abspath(__file__))+'/output/'
 os.makedirs(output_dir, exist_ok=True)
 
@@ -31,7 +35,7 @@ np.random.seed(87)
 # PRIORS
 priors = (lambda x : {
     'missing' : beta.pdf(x['missing'], a=3,   b=15),
-    'mixture' : 1, # In this analysis lambda is fixed to one, so the prior doesn't change
+    'mixture' : 1,
     'shape'   : lognorm.pdf(x['shape'],  scale=1,  s = 0.5),
     'scale'   : gamma.pdf( x['scale'], a=6,   scale = 50)
 })
@@ -40,27 +44,27 @@ priors = (lambda x : {
 # This is controlled by the sigma of the gaussian, which is defined for each variable
 proposal_sigma = {
     'missing' : 0.0,
-    'shape'   : 0.05,
-    'scale'   : 2,
-    'mixture' : 0
-    }
+    'shape'  : 0.05,
+    'scale'  : 2,
+    'mixture' : 0.0,
+}
 
 print("\nBeginning MCMC.\n\n")
 
-for i in [1,2,3,4]:
-    mcmc.run_MCMC(
-        data= am_data,
-        initial_parameters = {
-            'missing' : [0.32,0.32,0.32,0.32] [i-1],
-            'shape'   : [   2, 0.5, 0.2,   1] [i-1],
-            'scale'   : [  70,  40, 100,  10] [i-1],
-            'mixture' : [   1,   1,   1,   1] [i-1]
-        },
-        proposal_sigma = proposal_sigma,
-        priors = priors,
-        thin=thin,
-        nreps=nreps,
-        output_dir = output_dir,
-        chain_name = 'chain' + str(i),
-        max_distance = max_distance
-        )
+i = args.i
+mcmc.run_MCMC(
+    data= am_data,
+    initial_parameters = {
+        'missing' : [ 0.5, 0.5, 0.5, 0.5] [i-1],
+        'shape'   : [   2, 0.5, 0.2,   1] [i-1],
+        'scale'   : [  70,  40, 100,  10] [i-1],
+        'mixture' : [   1,   1,   1,   1] [i-1]
+    },
+    proposal_sigma = proposal_sigma,
+    priors = priors,
+    thin=thin,
+    nreps=nreps,
+    output_dir = output_dir,
+    chain_name = 'chain' + str(i),
+    max_distance = max_distance
+    )

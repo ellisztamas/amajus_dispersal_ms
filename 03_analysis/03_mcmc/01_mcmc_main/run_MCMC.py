@@ -17,7 +17,7 @@ import argparse
 from amajusmating import mcmc
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-i', required = True)
+parser.add_argument('-i', required = True, type=int)
 args = parser.parse_args()
 
 # FAPS objects and distance matrices are generated in a separate script.
