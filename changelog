@@ -1,5 +1,33 @@
 # Change log
 
+## no_mixture MCMC with q=0.5
+
+28th June 2023
+
+Ran the MCMC for the model with lambda=1 with proportion of missing fathers set
+to 0.5 (see f70f1200ae95c8e63ff76ef0e945631dec6382bb).
+
+Corrected typos in the main MCMC analysis.
+
+## Set hard prior on q to 0.5
+
+30th May 2023
+
+Set the prior on the pro portion of missing fathers to a hard prior of 0.5.
+This sets equal prior weight on probability mass from sampled and unsampled
+candidates, meaning that the signal all comes from the data. I also set this up
+to run as a parallel batch job.
+
+This is because when q is allowed to vary the model moves straight to q=1 -
+everyone is compatible with a missing father, so this solution has high
+likelihood. I also don't like running separate analyses for different values of
+q because this becomes very cumbersome to run and present, and doesn't really 
+change much. Instead, I'll discuss other ways to establish who the proportion of
+missing fathers.
+
+This is initially done for the 'main' MCMC to check it works. Still need to 
+repeat this for a model with no mixture, and possibly include assortment.
+
 ## Simulations with missing fathers
 
 25th May 2023
