@@ -28,20 +28,20 @@ set.seed(1204 )
 
 ```{r import-data, cache=TRUE}
 # Import all the MCMC results and concatenate into a single data.frame
-mcmc_results <- list.dirs("03_analysis/03_mcmc", recursive = FALSE)[-4] %>%
+mcmc_results <- list.dirs("03_analysis/03_mcmc", recursive = FALSE)[c(1)] %>%
   map(import_mcmc_results) %>%
   do.call(what = "rbind") %>%
-  filter(iter > 500) %>% # Remove the first 500 iterations as burnin
+  filter(iter > 500) #%>% # Remove the first 500 iterations as burnin
   # Change the names for each analysis to something human readable
-  mutate(
-    scenario = recode_factor(
-      scenario,
-      `02_mcmc_022_missing_fathers` = "q=0.22",
-      `01_mcmc_main` = "q=0.32",
-      `03_mcmc_042_missing_fathers` = "q=0.42"#,
-      # `04_no_mixture` = "No mixture"
-      )
-  )
+  # mutate(
+  #   scenario = recode_factor(
+  #     scenario,
+  #     # `02_mcmc_022_missing_fathers` = "q=0.22",
+  #     `01_mcmc_main` = "q=0.32",
+  #     # `03_mcmc_042_missing_fathers` = "q=0.42"#,
+  #     `04_no_mixture` = "No mixture"
+  #     )
+  # )
 
 # Import data table listing mating events
 me = read_csv(
@@ -267,7 +267,7 @@ me %>% group_by(mother, father) %>%
 ```{r east-west-distance, fig.cap="Histogram of East-West distances between mother and father for each mating event, weighted by posterior probability of each mating event having occured. Postive values indicate the father is further West of the mother."}
 
 me %>% 
-  filter(!is.na(father)) %>% 
+  filter(!is.na(father), offspring >1) %>% 
   mutate(
     eastwest = Easting_father - Easting_mother
   ) %>%
@@ -281,16 +281,16 @@ me %>%
     ) +
   theme_bw()
 
-# me %>% 
-#   filter(!is.na(father)) %>% 
-#   mutate(
-#     eastwest = Easting_father - Easting_mother
-#   ) %>%
-#   mutate( direction = ifelse(eastwest > 0, 0, 1)) %>% 
-#   group_by(direction) %>% 
-#   summarise(
-#     n = sum(prob) / 1000,
-#   )
+me %>%
+  filter(!is.na(father), offspring >1) %>%
+  mutate(
+    eastwest = Easting_father - Easting_mother
+  ) %>%
+  mutate( direction = ifelse(eastwest > 0, 0, 1)) %>%
+  group_by(direction) %>%
+  summarise(
+    n = sum(prob) / 1000,
+  )
 
 ```
 

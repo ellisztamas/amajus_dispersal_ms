@@ -7,13 +7,13 @@ source("04_figures/02_posterior_distributions/summarise_posteriors.R")
 
 # Import data on mating events
 me <-read_csv(
-  "03_analysis/04_mating_events/output/01_mcmc_restrict_kurtosis/mating_events_over_chains.csv",
+  "03_analysis/04_mating_events/output/01_mcmc_main/mating_events_over_chains.csv",
   col_types = cols()) %>% 
   filter( !is.na(father) ) # remove mating events with a missing father
 
 # Histogram of disperal distances
 linear_dispersal <- me %>% 
-  filter( offspring > 1 ) %>% 
+  # filter( offspring > 1) %>%
   mutate(iter = as.factor(iter)) %>% 
   ggplot( aes(x = distance, weights = prob) ) +
   geom_histogram(aes(
@@ -30,7 +30,7 @@ linear_dispersal <- me %>%
 # Log cumulative distribution of disperal distances.
 log_dispersal <- me %>% 
   mutate(iter = as.factor(iter)) %>% 
-  filter( offspring > 1 ) %>% 
+  # filter( offspring > 1 ) %>% 
   ggplot( aes(x = distance, weights = prob, groups = iter) ) +
   stat_ecdf(
     geom = "step",

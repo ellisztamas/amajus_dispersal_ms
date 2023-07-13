@@ -1,5 +1,13 @@
 # Change log
 
+## Fiddling
+
+Minor formatting changes.
+
+Tried plotting things with and without singletons families.
+
+Corrected paths to MCMC results
+
 ## no_mixture MCMC with q=0.5
 
 28th June 2023

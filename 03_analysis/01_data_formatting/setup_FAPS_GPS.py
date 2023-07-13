@@ -82,9 +82,9 @@ progeny = progeny.split(by=progeny.mothers)
 # FILTER OUT FATHERS WITH OPPOSING GENOTYPES
 # For each maternal family, create a matrix giving the number of loci at which 
 # a candidate and offspring have opposing homozygous genotypes.
-for k in patlik.keys():
-    patlik[k].clashes = fp.incompatibilities(adults, progeny[k])
-    patlik[k].max_clashes=2 # Define a maximum number of homozygous incompatibilities are allowed for each trio
+# for k in patlik.keys():
+#     patlik[k].clashes = fp.incompatibilities(adults, progeny[k])
+#     patlik[k].max_clashes=2 # Define a maximum number of homozygous incompatibilities are allowed for each trio
 
 # GPS DATA
 print("Incorportating GPS and flower-colour data.")
