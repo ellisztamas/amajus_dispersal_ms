@@ -1,5 +1,16 @@
 # Change log
 
+## Tidy MCMC analyses
+
+13th July 2023
+
+Simplified the folder of MCMC results.
+
+* Removed the analyses using missing fathers = 0.22 and 0.42
+* Changed 04_no_mixture to 02_no_mixture
+* Removed all the output files, because tracking them will really slow down the
+git repo...
+
 ## Fiddling
 
 Minor formatting changes.
