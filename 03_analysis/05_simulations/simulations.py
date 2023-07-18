@@ -8,7 +8,6 @@ from amajusmating.mating import import_mcmc
 # FAPS objects and distance matrices are generated in a separate script.
 exec(open('03_analysis/01_data_formatting/setup_FAPS_GPS.py').read())
 
-
 # Import the mating events we generated in a previous analysis.
 mating_events = pd.read_csv("03_analysis/04_mating_events/output/01_mcmc_main/mating_events_over_chains.csv")
 # Trim mating events with probability < 0.9, and at least two offspring so we
@@ -25,7 +24,7 @@ burnin = 1500
 input_dir = "03_analysis/03_mcmc/01_mcmc_main/output/"
 mcmc = import_mcmc(input_dir, burnin=burnin)
 # Just use 200 random iterations from the MCMC
-ix = np.sort( np.random.random_integers(0,mcmc.shape[0], 200) )
+ix = np.sort( np.random.randint(0,mcmc.shape[0], 200) )
 mcmc = mcmc.iloc[ix, :].reset_index()
 
 # File to output the results.

@@ -249,13 +249,14 @@ def simulate_missing_fathers(data, progeny, paternity_array, q):
     =======
     Dictionary giving:
         'q'                     : Proportion of fathers removed
-        'false_negative'        : Probability that progeny with a sampled father were assigned 'missing' as a father
+        'true_positive'         : Probability that a true father is the most likely candidate, assuming he is sampled
+        'false_negative'        : Probability that a father is most likely missing, even if he is sampled
         'total_orphans'         : Number of progeny whose father was removed
         'identified_as_missing' : Number of orphaned progeny whose father was identified as missing
         'false_singleton'       : Number of orphaned progeny assigned to a singleton family
         'prob_false_paternity'  : Mean posterior probability of paternity for falsely assigned fathers
         'median_distance_real'  : Weighted-median dispersal distance in the complete dataset
-        'median_distance_purged': Weighted-median dispersal distance after subsampling fathers
+        'median_distance_inferred' : Weighted-median dispersal distance after subsampling fathers
 
     """
     # Purge some of the real fathers and cluster into sibships again
@@ -287,9 +288,11 @@ def simulate_missing_fathers(data, progeny, paternity_array, q):
     # Number of progeny whose father was removed
     total_orphans = me_purged.shape[0]
     # Frequency of missing fathers inferred to be missing
-    orphans_identified_as_missing = np.sum( me_purged['candidate_1'] == "missing"  ) 
+    orphans_identified_as_missing = np.sum( me_purged['candidate_1'] == "missing"  )
+    # Probability that true fathers are identified, given that they are sampled
+    true_positive = np.mean( me_not_purged['real_father'] == me_not_purged['candidate_1'] )
     # Probability that true fathers are inferred to be missing
-    false_negative = np.mean( me_not_purged['candidate_1'] == "missing"  ) 
+    false_negative = np.mean( me_not_purged['candidate_1'] == "missing"  )  
     # Probability that when the father is missing, offspring are falsely assigned to a family of size=1.
     orphans_in_singleton_family = np.sum(
         me_purged[me_purged['candidate_1'] != "missing"].groupby(['mother', 'candidate_1']).size() == 1
@@ -308,20 +311,27 @@ def simulate_missing_fathers(data, progeny, paternity_array, q):
     median_distance_real = me_combined.\
         merge(distance_df, how="left", left_on=['mother', 'real_father'], right_on = ['mother', 'father']).\
             drop_duplicates(subset=['mother', 'real_father'])
-    median_distance_purged = me_combined.\
+    
+    median_distance_purged = me_purged.\
         merge(distance_df, how="left", left_on=['mother', 'candidate_1'], right_on = ['mother', 'father']).\
         drop_duplicates(subset=['mother', 'real_father'])
-    # Calculate median dispersal distance weighted by posterior support for each mating event.
-    median_distance_real   = wquantiles.median(median_distance_real['distance'],   np.exp(median_distance_real['logprob_1']))
-    median_distance_purged = wquantiles.median(median_distance_purged['distance'], np.exp(median_distance_purged['logprob_1']))
+    median_distance_purged = median_distance_purged.loc[~median_distance_purged['distance'].isna()]
+
+    median_distance_inferred = me_combined.\
+        merge(distance_df, how="left", left_on=['mother', 'candidate_1'], right_on = ['mother', 'father']).\
+        drop_duplicates(subset=['mother', 'real_father'])
     
+    # Calculate median dispersal distance weighted by posterior support for each mating event.
+    median_distance_real     = wquantiles.median(median_distance_real['distance'],   np.exp(median_distance_real['logprob_1']))
+    median_distance_inferred = wquantiles.median(median_distance_inferred['distance'], np.exp(median_distance_inferred['logprob_1']))
     return {
         'q'                     : q,
+        'true_positive'         : true_positive,
         'false_negative'        : false_negative,
         'total_orphans'         : total_orphans,
         'identified_as_missing' : orphans_identified_as_missing,
         'false_singleton'       : orphans_in_singleton_family,
         'prob_false_paternity'  : prob_false_paternity,
         'median_distance_real'  : median_distance_real,
-        'median_distance_purged': median_distance_purged
+        'median_distance_inferred' : median_distance_inferred
     }

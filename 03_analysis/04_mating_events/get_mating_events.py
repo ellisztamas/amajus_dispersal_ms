@@ -22,7 +22,7 @@ exec(open('03_analysis/01_data_formatting/setup_FAPS_GPS.py').read())
 
 # Parameters for posterior simulations of mating
 np.random.seed(87)
-burnin = 1500
+burnin = 500
 
 # Input and output data
 input_dir = args.input

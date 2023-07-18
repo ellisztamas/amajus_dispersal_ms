@@ -1,5 +1,27 @@
 # Change log
 
+## Change simulations to calculate error rates
+
+13th July 2023
+
+I want to change the simulations to calculate how reliable paternity is when
+there are missing fathers. 
+
+The most likely father for a single offspring can be the real father (F), an 
+unrelated father (U), or a missing father (M). Then we want to know:
+* P(F|F) that the true father is the most likely given that he is present
+* P(U|F) that an unrelated father is the most likely, when F is present
+* P(M|F) that a father is assigned missing when he is present
+* P(M|M) that a missing father is correctly assigned as missing
+* P(U|M) that an unrelated father is the most likely, when F is not sampled
+
+I added calculation of P(F|F) to the simulations.
+I realised that they already calculate P(M|F), and P(U|F) = 1- P(F|F) - P(M|F).
+I can get P(M|M) and P(U|M) from the numbers of orphans, also already in the code.
+
+Also repeated the inference of mating events using only 500 iterations as
+burnin.
+
 ## Tidy MCMC analyses
 
 13th July 2023
