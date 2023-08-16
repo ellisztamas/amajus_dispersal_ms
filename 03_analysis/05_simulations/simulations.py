@@ -18,7 +18,7 @@ loc[(mating_events['prob'] > 0.9) &
 
 # Parameters for posterior simulations of mating
 np.random.seed(87)
-burnin = 1500
+burnin = 500
 
 # Import MCMC results with mating parameters at each iteration
 input_dir = "03_analysis/03_mcmc/01_mcmc_main/output/"
@@ -31,9 +31,9 @@ mcmc = mcmc.iloc[ix, :].reset_index()
 output_dir = "03_analysis/05_simulations"
 # We will append the file at each iteration, so first check whether there's a
 # file there already and remove it.
-if(os.path.isfile(output_dir + "/compare_paternity_accuracy.csv")):
-    os.remove(output_dir + "/compare_paternity_accuracy.csv")
-    print("Removing output file: " + output_dir + "/compare_paternity_accuracy.csv")
+# if(os.path.isfile(output_dir + "/compare_paternity_accuracy.csv")):
+#     os.remove(output_dir + "/compare_paternity_accuracy.csv")
+#     print("Removing output file: " + output_dir + "/compare_paternity_accuracy.csv")
 if(os.path.isfile(output_dir + "/missing_fathers.csv")):
     os.remove(output_dir + "/missing_fathers.csv")
     print("Removing output file: " + output_dir + "/missing_fathers.csv")
@@ -47,12 +47,12 @@ for i in tqdm(mcmc.index):
     # Simulate progeny and calculate paternity likelihoods
     sim_progeny, patlik = sim.simulation_paternity(am_data, model, me, adults, mu = 0.0001)
         
-    # Get the accuracy of paternity based on paternity only, paternity plus sibships, and the joint model
-    accuracy = sim.compare_paternity_accuracy(sim_progeny, patlik, adults)
-    accuracy.insert(loc=0, column='iter', value=i) # add a column giving the iteration label.
-    # Write to disk
-    with open(output_dir + "/compare_paternity_accuracy.csv", 'a') as f:
-        accuracy.to_csv(f, mode='a', header=f.tell()==0, float_format='%.4f', index=False)
+    # # Get the accuracy of paternity based on paternity only, paternity plus sibships, and the joint model
+    # accuracy = sim.compare_paternity_accuracy(sim_progeny, patlik, adults)
+    # accuracy.insert(loc=0, column='iter', value=i) # add a column giving the iteration label.
+    # # Write to disk
+    # with open(output_dir + "/compare_paternity_accuracy.csv", 'a') as f:
+    #     accuracy.to_csv(f, mode='a', header=f.tell()==0, float_format='%.4f', index=False)
     
     # Remove a proportion of the true fathers and see how this affects paternity assignments.
     # See amajus.sims.missing_fathers for details of the output.
