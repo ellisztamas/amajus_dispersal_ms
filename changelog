@@ -1,5 +1,18 @@
 # Change log
 
+## Changed simulations to return mating events
+
+22nd August 2023
+
+On revising the manuscript it is difficult to compare the simulations to the
+real data, because the former calculate things about individuals while the latter
+focusses on mating events (paternity of whole sibships). The simulations also
+save summary statistics, but I keep changing my mind about what to report.
+
+I changed it up to instead focus on tables of correct and inferred mating events,
+and merge the two. From this I will be able to calculate false positive/negative
+error rates and family sizes.
+
 ## Change simulations to calculate error rates
 
 13th July 2023
