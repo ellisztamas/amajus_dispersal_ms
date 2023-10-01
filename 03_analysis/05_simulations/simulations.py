@@ -44,9 +44,8 @@ for i in tqdm(mcmc.index):
     sim_data = sim.simulate_dataset(am_data, model, me, adults, mu)
 
     # Infer mating events for different values of proportion of missing fathers (q)
-    sim_mating_events = [ simulate_mating_events(sim_data, q) for q in [0.1, 0.2, 0.3, 0.4, 0.5] ]
+    sim_mating_events = [ sim.simulate_mating_events(sim_data, q) for q in [0.1, 0.2, 0.3, 0.4, 0.5] ]
     sim_mating_events = pd.DataFrame(sim_mating_events)
-    sim_mating_events.insert(loc=0, column='iter', value=i) # add a column giving the iteration label.
 
     # Write to disk
     with open(output_dir + "/simulated_mating_events.csv", 'a') as f:
