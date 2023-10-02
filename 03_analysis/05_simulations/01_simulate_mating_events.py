@@ -1,3 +1,22 @@
+"""
+Simulate mating events for increasing proportions of missing fathers.
+
+This chooses mates for each real mother based on the distance between them and 
+pollen dispersal probabilities, and mates them to generate offspring genotypes.
+The number and size of each full-sib family is taken from observed mating events.
+A propotion of the true fathers are then removed at random.
+This simulation assumes the proportion of missing fathers is known.
+
+It then runs FAPS on the offspring and returns a list of all mating events, 
+including real and inferred mating events.
+Rows with non-NA value for offspring_real are real mating events.
+Rows with non-NA values for offspring_inf are inferred mating events.
+Rows with father=='nan' are inferred families for whom the father was not found.
+
+Tom Ellis
+"""
+
+
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -44,9 +63,10 @@ for i in tqdm(mcmc.index):
     sim_data = sim.simulate_dataset(am_data, model, me, adults, mu)
 
     # Infer mating events for different values of proportion of missing fathers (q)
-    sim_mating_events = [ sim.simulate_mating_events(sim_data, q) for q in [0.1, 0.2, 0.3, 0.4, 0.5] ]
-    sim_mating_events = pd.DataFrame(sim_mating_events)
-
+    sim_mating_events = [ sim.simulate_mating_events(sim_data, q_real = q) for q in [0, 0.1, 0.2, 0.3, 0.4, 0.5] ]
+    sim_mating_events = pd.concat(sim_mating_events)
+    sim_mating_events.insert(loc=0, column='iter', value=i) # add a column giving the iteration label.
+    
     # Write to disk
     with open(output_dir + "/simulated_mating_events.csv", 'a') as f:
         sim_mating_events.to_csv(f, mode='a', header=f.tell()==0, float_format='%.4f', index=False)

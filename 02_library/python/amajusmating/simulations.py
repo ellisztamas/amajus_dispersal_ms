@@ -164,21 +164,24 @@ def simulate_dataset(data, model, mating_events, genotypes, mu):
 
     return sim_data
 
-def simulate_mating_events(sim_data, q=0):
+def simulate_mating_events(sim_data, q_real=0, q_param=None):
     """
     Infer mating events from simulated data.
 
     This takes a dictionary of correct mating events and the corresponding
     paternity array, removes a sample of fathers at random, and infers mating
-    events from the data.
+    events from the data.   
 
     Parameters
     ==========
     sim_data: dict
         Dictionary giving a set of correct mating events and the corresponding
         paternity array. This is the output of `simulate_data()`.
-    q: float
-        Proportion of missing fathers.
+    q_real: float
+        True proportion of missing fathers.
+    q_param: float
+        Input value for the proportion of missing fathers used as a prior for 
+        paternity inference. Defaults to q_real.
     
     Returns
     =======
@@ -190,13 +193,19 @@ def simulate_mating_events(sim_data, q=0):
         'prob' : Posterior probability of the inferred mating event.
         'offspring_inf' : Number of inferred offspring. NaN for correct mating 
             events that were not detected.
+        'q_real' : True proportion of missing fathers.
+        'q_param': Input value for the proportion of missing fathers used as a prior for 
+            paternity inference.
     """
+    if q_param is None:
+        q_param = q_real
+        
     # Create a list of randomly selected fathers to remove from the data.
-    n_to_purge = int(np.round(len(sim_data['mating_events']['father']) * q))
+    n_to_purge = int(np.round(len(sim_data['mating_events']['father']) * q_real))
     fathers_to_purge = np.random.choice(sim_data['mating_events']['father'], size =  n_to_purge, replace = False)
 
     for k in sim_data['paternity_array'].keys():
-        sim_data['paternity_array'][k].missing_parents = q # Set the prior proportion of missing fathers
+        sim_data['paternity_array'][k].missing_parents = q_param # Set the prior proportion of missing fathers
         sim_data['paternity_array'][k].purge = fathers_to_purge # Set log likelihoods for purged candidates to -Inf
 
     # Cluster into sibships, and get a list of inferred mating events
@@ -210,7 +219,9 @@ def simulate_mating_events(sim_data, q=0):
         inferred_mating_events, how="outer", on = ('mother', 'father'), suffixes = ('_real', '_inf')
         )
     output = output.drop('log_prob', axis=1)
-    output['q'] = q
+    output['q_real'] = q_real
+    output['q_param'] = q_param
+
 
     return output
     
