@@ -29,37 +29,25 @@ mcmc = mcmc.iloc[ix, :].reset_index()
 
 # File to output the results.
 output_dir = "03_analysis/05_simulations"
-# We will append the file at each iteration, so first check whether there's a
+# The simulation appends the file at each iteration, so first check whether there's a
 # file there already and remove it.
-# if(os.path.isfile(output_dir + "/compare_paternity_accuracy.csv")):
-#     os.remove(output_dir + "/compare_paternity_accuracy.csv")
-#     print("Removing output file: " + output_dir + "/compare_paternity_accuracy.csv")
-if(os.path.isfile(output_dir + "/missing_fathers.csv")):
-    os.remove(output_dir + "/missing_fathers.csv")
-    print("Removing output file: " + output_dir + "/missing_fathers.csv")
-
+if(os.path.isfile(output_dir + "/simulated_mating_events.csv")):
+    os.remove(output_dir + "/simulated_mating_events.csv")
+    print("Removing output file: " + output_dir + "/simulated_mating_events.csv")
 
 # Loop over steps in the MCMC chain and simulate mating events for each.
 for i in tqdm(mcmc.index):
     model = mcmc.loc[i] # Get current dispersal model settings
     me = mating_events.loc[mating_events['iter'] == i] # Mating events for this iteration
 
-    # Simulate progeny and calculate paternity likelihoods
-    sim_progeny, patlik = sim.simulation_paternity(am_data, model, me, adults, mu = 0.0001)
-        
-    # # Get the accuracy of paternity based on paternity only, paternity plus sibships, and the joint model
-    # accuracy = sim.compare_paternity_accuracy(sim_progeny, patlik, adults)
-    # accuracy.insert(loc=0, column='iter', value=i) # add a column giving the iteration label.
-    # # Write to disk
-    # with open(output_dir + "/compare_paternity_accuracy.csv", 'a') as f:
-    #     accuracy.to_csv(f, mode='a', header=f.tell()==0, float_format='%.4f', index=False)
-    
-    # Remove a proportion of the true fathers and see how this affects paternity assignments.
-    # See amajus.sims.missing_fathers for details of the output.
-    missing_dads = [sim.simulate_missing_fathers(am_data, sim_progeny, patlik, q) for q in [0.1, 0.2, 0.3, 0.4, 0.5] ]
-    missing_dads = pd.DataFrame(missing_dads)
-    missing_dads.insert(loc=0, column='iter', value=i) # add a column giving the iteration label.
+    # Simulate a dictionary of mating events, offspring genotypesand paternity likelihoods
+    sim_data = sim.simulate_dataset(am_data, model, me, adults, mu)
+
+    # Infer mating events for different values of proportion of missing fathers (q)
+    sim_mating_events = [ sim.simulate_mating_events(sim_data, q) for q in [0.1, 0.2, 0.3, 0.4, 0.5] ]
+    sim_mating_events = pd.DataFrame(sim_mating_events)
+
     # Write to disk
-    with open(output_dir + "/missing_fathers.csv", 'a') as f:
-        missing_dads.to_csv(f, mode='a', header=f.tell()==0, float_format='%.4f', index=False)
+    with open(output_dir + "/simulated_mating_events.csv", 'a') as f:
+        sim_mating_events.to_csv(f, mode='a', header=f.tell()==0, float_format='%.4f', index=False)
     

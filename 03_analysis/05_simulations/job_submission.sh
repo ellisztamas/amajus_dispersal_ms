@@ -5,6 +5,7 @@
 #SBATCH --job-name=amajus_simulations
 #SBATCH --qos=medium
 #SBATCH --output=slurm/amajus_simulations.out
+#SBATCH --error=/amajus_simulations.err
 #SBATCH --time=1-00:00:00
 
 # ENVIRONMENT #
