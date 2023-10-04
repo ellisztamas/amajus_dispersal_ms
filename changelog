@@ -1,5 +1,43 @@
 # Change log
 
+## Simulate mating events with incorrect priors on q
+
+2nd October 2023
+
+I repeated and modified the simulation of mating events to simulate *true*
+values of q of 0.1, 0.3 and 0.5, but evalulate each using input values of q
+of 0.1, 0.2, 0.3, 0.4, 0.5.'
+
+Expanded simulation function to take arguments q_real and q_param to do this.
+
+Added doc string to the existing simulation.
+
+## Simulate mating events
+
+On rewriting the text I realise that the current simulation format is clunky
+because they describe paternity of individuals, whereas the main analysis
+focusses on mating events.
+
+Alter the current set up to list
+- true mating events with family sizes and probabilities (all 1)
+    - Families with missing fathers should be recorded as such
+- Inferred mating events with family sizes and probabilities
+- Do an outer join on mother and father. False positives should have NA for true
+    probability. False negatives should have NA for inferred probability.
+- Repeat for increased proportions of missing fathers
+
+Use this to quantify probability and size of:
+- families with sampled fathers whi could be identified (True positive)
+- True negative: Probability and size of offspring with missing dads 
+- Probability and size of a false family
+    
+## Update MCMC figures
+
+18th July 2023
+
+Updated figures to reflect simplified MCMC analysis
+
+
 ## Change simulations to calculate error rates
 
 13th July 2023
