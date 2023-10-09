@@ -1,5 +1,28 @@
 # Change log
 
+## Asymmetry and updated results
+
+Updated results section to describe simulations with different q values first.
+Updated results about how many families to follow on from that, making it clear
+that we only trust the big families.
+Updated the results about the change in median dispersal distance when lambda=0.
+
+Added result about asymmetric pollen dispersal.
+I used simulated mating events I already had as a null model to estimate how
+far east or west pollen is moving.
+I restricted this to mating events on the lower road only - added R script to 
+pull out the plants from the lower road.
+In fact, this doesn't affect the results very much.
+Added to methods and results.
+
+Updated the map to include pollen donors.
+Mentioned in the results that only mating event was found *between* the roads
+
+The discussion still needs updating.
+
+Removed a load of old functions from the simulations library module that I'd 
+commented out anyway.
+
 ## Tidied simulations
 
 6th October 2023

@@ -3,7 +3,7 @@ library(cowplot)
 
 # Import function to compute weighted cumulative density for dispersal distances
 source("02_library/R/stat_ecdf_weighted.R")
-source("04_figures/02_posterior_distributions/summarise_posteriors.R")
+# source("04_figures/02_posterior_distributions/summarise_posteriors.R")
 
 # Import data on mating events
 me <-read_csv(
@@ -13,7 +13,7 @@ me <-read_csv(
 
 # Histogram of disperal distances
 linear_dispersal <- me %>% 
-  # filter( offspring > 1) %>%
+  filter(offspring >=1) %>%
   mutate(iter = as.factor(iter)) %>% 
   ggplot( aes(x = distance, weights = prob) ) +
   geom_histogram(aes(
@@ -29,8 +29,8 @@ linear_dispersal <- me %>%
 
 # Log cumulative distribution of disperal distances.
 log_dispersal <- me %>% 
+  filter(offspring >=1) %>%
   mutate(iter = as.factor(iter)) %>% 
-  # filter( offspring > 1 ) %>% 
   ggplot( aes(x = distance, weights = prob, groups = iter) ) +
   stat_ecdf(
     geom = "step",
@@ -50,24 +50,26 @@ inset_plot <- ggdraw() +
   draw_plot(linear_dispersal) + draw_plot_label("A") + 
   draw_plot(log_dispersal, x = 0.95, y = 0.95, width = 0.6, height = 0.6, hjust = 1, vjust = 1)
 
-# Summary plots of median dispersal and the number of sires >500m from the mother
-plist <- list(
-  plot_parameter("median_dispersal", "Median dispersal (m)")  + theme( axis.text.x = element_blank() ),
-  plot_parameter("long_range_dispersal", "Sires >500m") + theme( axis.text.x = element_blank() ) + 
-    theme(
-      axis.text.x = element_text(angle = 90, hjust = 1, size = 7),
-      axis.text.y = element_text(size = 8)
-      )
-)
-plot_summaries <- ggarrange(plotlist = plist, ncol=1, heights = c(1,1.2), labels = LETTERS[3:4])
+
+  
+# # Summary plots of median dispersal and the number of sires >500m from the mother
+# plist <- list(
+#   plot_parameter("median_dispersal", "Median dispersal (m)")  + theme( axis.text.x = element_blank() ),
+#   plot_parameter("long_range_dispersal", "Sires >500m") + theme( axis.text.x = element_blank() ) + 
+#     theme(
+#       axis.text.x = element_text(angle = 90, hjust = 1, size = 7),
+#       axis.text.y = element_text(size = 8)
+#       )
+# )
+# # plot_summaries <- ggarrange(plotlist = plist, ncol=1, heights = c(1,1.2), labels = LETTERS[3:4])
 
 # Glue the inset plot and MCMC summaries together
-dispersal_plot <- ggarrange(inset_plot, plot_summaries, ncol = 2, widths = c(5,3))
+# dispersal_plot <- ggarrange(inset_plot, plot_summaries, ncol = 2, widths = c(5,3))
 
 # Save to disk.
 ggsave(filename = "05_manuscript/dispersal.eps", 
-       plot = dispersal_plot,
-       width = 169, 
+       plot = inset_plot,
+       width = 112, 
        height = 120,
        units = "mm",
        device = "eps")

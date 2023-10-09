@@ -5,6 +5,7 @@ date: ""
 output: pdf_document
 ---
 
+
 ```{r setup, message=FALSE, echo =FALSE }
 knitr::opts_chunk$set(
   echo = FALSE,
@@ -28,20 +29,18 @@ set.seed(1204 )
 
 ```{r import-data, cache=TRUE}
 # Import all the MCMC results and concatenate into a single data.frame
-mcmc_results <- list.dirs("03_analysis/03_mcmc", recursive = FALSE)[c(1)] %>%
+mcmc_results <- list.dirs("03_analysis/03_mcmc", recursive = FALSE) %>%
   map(import_mcmc_results) %>%
   do.call(what = "rbind") %>%
-  filter(iter > 500) #%>% # Remove the first 500 iterations as burnin
+  filter(iter > 500) %>% # Remove the first 500 iterations as burnin
   # Change the names for each analysis to something human readable
-  # mutate(
-  #   scenario = recode_factor(
-  #     scenario,
-  #     # `02_mcmc_022_missing_fathers` = "q=0.22",
-  #     `01_mcmc_main` = "q=0.32",
-  #     # `03_mcmc_042_missing_fathers` = "q=0.42"#,
-  #     `04_no_mixture` = "No mixture"
-  #     )
-  # )
+  mutate(
+    scenario = recode_factor(
+      scenario,
+      `01_mcmc_main` = "Mixture allowed",
+      `02_no_mixture` = "No mixture"
+      )
+  )
 
 # Import data table listing mating events
 me = read_csv(
@@ -103,72 +102,65 @@ hist(prior_values$sim$draws,
 
 ```
 
-```{r caterpillar-plots, fig.cap="Change in log posterior density over four independent MCMC chains for five dispersal scenarios. The first 500 iterations of each chain have been removed as burn-in.", fig.width=22/2.54}
+```{r prob-family-sizes, fig.cap="Posterior probabilities and sizes of paternal families. Each point shows the mean probability of a mating event between a mother and a single father averaged over 1000 MCMC iterations for the 'restricted-kurtosis' prior scenario, with 96% credible intervals. Colour indicates whether the father was in the sample of candidate or was unsampled. Note that individuals in families with unsampled fathers may consist of multiple paternal families."}
 
-# Plot the change in log posterior through time
-mcmc_results %>%
-  ggplot(aes(x = iter, y = log_posterior, colour = chain, groups = chain)) +
-  geom_line() +
+n_iter <- length(unique(me$iter))
+
+# p2 <-
+
+me %>% 
+  # Keep only mating events with a sampled father
+  # filter( !is.na(father) ) %>%
+  # mutate(found_father = ifelse(is.na(father), "Sampled candidate", "Missing father")) %>% 
+  group_by(mother, father) %>% 
+  summarise(
+    sibship_size = sum(offspring) / n_iter,
+    p = sum(prob) / n_iter,
+    p_lower = quantile(prob, 0.02),
+    p_upper = quantile(prob, 0.98)
+  ) %>% 
+  mutate(Sire = ifelse( is.na(father), "Unsampled", "Sampled")) %>% 
+  ggplot(aes(y = p, x = sibship_size, colour = Sire)) + 
+  geom_point() +
+  geom_errorbar( aes( ymin = p_lower, ymax = p_upper )) +
   labs(
-    x = "Iteration",
-    y = "Log posterior"
+    x = "Paternal family size",
+    y = "Mean posterior probability"
   ) +
-  facet_grid(~ scenario) +
   theme_bw() +
-  theme(
-    legend.position = "bottom",
-    axis.text.x = element_text(angle = 45, hjust = 1)
-  )
+  theme(legend.position = "bottom") +
+  facet_grid(rows = vars(Sire))
+
+# me %>% 
+#   mutate(Sire = ifelse(is.na(father), "Missing father", "Sampled candidate")) %>% 
+#   ggplot( aes(x = offspring, weights = prob, group=Sire, colour=Sire) ) +
+#   stat_ecdf(
+#     geom = "step",
+#     pad = FALSE
+#   )
+# 
+
 ```
 
-```{r posterior-histograms, fig.width=16.9/2.54, fig.height=20/2.54, fig.cap = "Posterior densities for the shape, scale and mixture parameters of the dispersal kernel. Histograms show stacked densities for each of four independent chains, for the five dispersal scenarios."}
-posterior_density <- list(
-  scale = mcmc_results %>%
-    filter(scenario != "No mixture") %>% 
-    ggplot(aes(x = scale, colour = chain, groups=chain, fill = chain)) +
-    geom_histogram() +
-    labs(
-      x = "Scale",
-      y = "Posterior density"
-    ) +
-    facet_grid( scenario ~ .) +
-    theme_bw() +
-    theme(
-      strip.text.y = element_blank()
-    ),
-  
-  shape = mcmc_results %>%
-    filter(scenario != "No mixture") %>% 
-    ggplot(aes(x = shape, colour = chain, groups=chain, fill = chain)) +
-    geom_histogram() +
-    labs(
-      x = "Shape",
-      y = ""
-    ) +
-    facet_grid( scenario ~ .)+
-    theme_bw() +
-    theme(
-      strip.text.y = element_blank()
-    ),
-  
-  mixture = mcmc_results %>%
-    filter(scenario != "No mixture") %>% 
-    ggplot(aes(x = mixture, colour = chain, groups=chain, fill = chain)) +
-    geom_histogram() +
-    labs(
-      x = "Mixture",
-      y = ""
-    ) +
-    facet_grid( scenario ~ .)+
-    theme_bw()
-)
-
-ggarrange(
-  plotlist = posterior_density,
-  ncol = 3,
-  common.legend = TRUE,
-  legend = "bottom"
-)
+```{r family-sizes, fig.cap="Histogram of paternal family sizes weighted by posterior probability of each family. Data are shown for families with an identifiable father, and those inferred to be sired by an unsampled father. Colours indicate whether weighted-mean family size was more or less than one."}
+me %>% 
+  mutate(`Family size` = ifelse(offspring <1, "Less than one", "One or more")) %>% 
+  group_by(mother, father, `Family size`) %>% 
+  summarise(
+    sibship_size = sum(offspring) / n_iter,
+    p = sum(prob) / n_iter,
+    p_lower = quantile(prob, 0.02),
+    p_upper = quantile(prob, 0.98)
+  ) %>% 
+  mutate(Sire = ifelse( is.na(father), "Unsampled", "Sampled")) %>% 
+  ggplot(aes(x = sibship_size, weight = p, fill=`Family size`)) + 
+  geom_histogram(breaks = seq(0,23,by=1)) +
+  labs(
+    x = "Sibship size",
+    y = "Number of paternal families"
+  ) +
+  facet_grid(~Sire) +
+  theme_bw()
 
 ```
 
@@ -214,86 +206,57 @@ mean_me %>%
 
 ```
 
-```{r prob-family-sizes, fig.cap="Posterior probabilities and sizes of paternal families. Each point shows the mean probability of a mating event between a mother and a single father averaged over 1000 MCMC iterations for the 'restricted-kurtosis' prior scenario, with 96% credible intervals. Colour indicates whether the father was in the sample of candidate or was unsampled. Note that individuals in families with unsampled fathers may consist of multiple paternal families."}
+```{r caterpillar-plots, fig.cap="Change in log posterior density over four independent MCMC chains. The first 500 iterations of each chain have been removed as burn-in.", fig.width=22/2.54}
 
-n_iter <- length(unique(me$iter))
-
-# p2 <-
-
-me %>% 
-  # Keep only mating events with a sampled father
-  # filter( !is.na(father) ) %>%
-  # mutate(found_father = ifelse(is.na(father), "Sampled candidate", "Missing father")) %>% 
-  group_by(mother, father) %>% 
-  summarise(
-    sibship_size = sum(offspring) / n_iter,
-    p = sum(prob) / n_iter,
-    p_lower = quantile(prob, 0.02),
-    p_upper = quantile(prob, 0.98)
-  ) %>% 
-  mutate(Sire = ifelse( is.na(father), "Missing father", "Sampled candidate")) %>% 
-  ggplot(aes(y = p, x = sibship_size, colour = Sire)) + 
-  geom_point() +
-  geom_errorbar( aes( ymin = p_lower, ymax = p_upper )) +
+# Plot the change in log posterior through time
+mcmc_results %>%
+  filter(scenario == "Mixture allowed") %>% 
+  ggplot(aes(x = iter, y = log_posterior, colour = chain, groups = chain)) +
+  geom_line() +
   labs(
-    x = "Paternal family size",
-    y = "Mean posterior probability"
+    x = "Iteration",
+    y = "Log posterior"
   ) +
+  # facet_grid(~ scenario) +
   theme_bw() +
-  theme(legend.position = "bottom")
-
-me %>% 
-  mutate(Sire = ifelse(is.na(father), "Missing father", "Sampled candidate")) %>% 
-  ggplot( aes(x = offspring, weights = prob, group=Sire, colour=Sire) ) +
-  stat_ecdf(
-    geom = "step",
-    pad = FALSE
+  theme(
+    legend.position = "bottom",
+    axis.text.x = element_text(angle = 45, hjust = 1)
   )
-
-me %>% group_by(mother, father) %>% 
-  summarise(
-    sibship_size = sum(offspring) / n_iter,
-    p = sum(prob) / n_iter,
-    p_lower = quantile(prob, 0.02),
-    p_upper = quantile(prob, 0.98)
-  ) %>% 
-  mutate(Sire = ifelse( is.na(father), "Missing father", "Sampled candidate")) %>% 
-  ggplot(aes(x = sibship_size, group=Sire, fill=Sire)) + 
-  geom_histogram(binwidth = 1)
-
-  
 ```
 
-```{r east-west-distance, fig.cap="Histogram of East-West distances between mother and father for each mating event, weighted by posterior probability of each mating event having occured. Postive values indicate the father is further West of the mother."}
+```{r no-mixture, fig.width=16.9/2.54, fig.height=8/2.54, fig.cap = "Posterior densities for the shape and scale parameters of the dispersal kernel for a model where the mixture parameter is fixed to one. Histograms show stacked densities for each of four independent chains."}
 
-me %>% 
-  filter(!is.na(father), offspring >1) %>% 
-  mutate(
-    eastwest = Easting_father - Easting_mother
-  ) %>%
-  ggplot( aes(x = eastwest, weights = prob) ) +
-  geom_histogram( aes(
-    y = stat(count / sum(count))
-    )) +
-  labs(
-    x = 'East-West distance from mother (m)',
-    y = "Density"
+posterior_density <- list(
+  scale = mcmc_results %>%
+    filter(scenario == "No mixture") %>% 
+    ggplot(aes(x = scale, colour = chain, groups=chain, fill = chain)) +
+    geom_histogram() +
+    labs(
+      x = "Scale",
+      y = "Posterior density"
     ) +
-  theme_bw()
+    theme_bw(),
+  
+  shape = mcmc_results %>%
+    filter(scenario == "No mixture") %>% 
+    ggplot(aes(x = shape, colour = chain, groups=chain, fill = chain)) +
+    geom_histogram() +
+    labs(
+      x = "Shape",
+      y = ""
+    ) +
+    theme_bw()
+)
 
-me %>%
-  filter(!is.na(father), offspring >1) %>%
-  mutate(
-    eastwest = Easting_father - Easting_mother
-  ) %>%
-  mutate( direction = ifelse(eastwest > 0, 0, 1)) %>%
-  group_by(direction) %>%
-  summarise(
-    n = sum(prob) / 1000,
-  )
+ggarrange(
+  plotlist = posterior_density,
+  ncol = 2,
+  common.legend = TRUE,
+  legend = "bottom"
+)
 
 ```
-
 
 ```{r sd-gnd, fig.cap="Mean dispersal distances implied by the second moment of the generalised normal distribution based on scale and shape parameters from MCMC chains for six prior scenarios."}
 

@@ -6,65 +6,59 @@ library(ggpubr)
 
 source("02_library/R/import_MCMC_results.R")
 
-# Import all the MCMC results and concatenate into a single data.frame
-mcmc_results <- list.dirs("03_analysis/03_mcmc", recursive = FALSE)[-4] %>%
-  map(import_mcmc_results) %>%
-  do.call(what = "rbind") %>%
-  filter(iter > 500) %>% # Remove the first 500 iterations as burnin
-  select(mixture, scale, shape, scenario) %>% 
-  pivot_longer(mixture : shape, names_to = "parameter")
+#x Import all the MCMC results and concatenate into a single data.frame
+mcmc_results <- import_mcmc_results("03_analysis/03_mcmc/01_mcmc_main") %>% 
+  filter(iter > 500) # Remove the first 500 iterations as burnin
 
+scale <- mcmc_results %>% 
+  ggplot(aes(x = scale, colour = chain, groups=chain, fill = chain)) +
+    geom_histogram() +
+    labs(
+      x = "Scale",
+      y = "Posterior density"
+    ) +
+    theme_bw() +
+    theme(
+      strip.text.y = element_blank()
+    )
 
-# Summarise means and CIs for each parameter
-mcmc_summary <-mcmc_results %>% 
-  group_by(scenario, parameter) %>% 
-  summarise(
-    mean = mean(value),
-    lower = quantile(value, 0.02),
-    upper = quantile(value, 0.98)
-  ) %>%  
-  # Change the names for each analysis to something human readable
-  mutate(
-    scenario = recode_factor(
-      scenario,
-      `02_mcmc_022_missing_fathers` = "q=0.22",
-      `01_mcmc_main` = "q=0.32",
-      `03_mcmc_042_missing_fathers` = "q=0.42"#,
-      # `04_no_mixture` = "No mixture"
-      )
+shape <- mcmc_results %>% 
+  ggplot(aes(x = shape, colour = chain, groups=chain, fill = chain)) +
+  geom_histogram() +
+  labs(
+    x = "Shape",
+    y = "Posterior density"
+  ) +
+  theme_bw() +
+  theme(
+    strip.text.y = element_blank()
   )
 
-# Function to plot means and credible intervals from the object created above.
-plot_parameter <- function(p, ylab){
-  mcmc_summary %>% 
-    filter(parameter == p) %>% 
-    ggplot(aes( y = mean, x = scenario)) +
-    geom_point() +
-    geom_errorbar(aes( ymin=lower, ymax=upper), width=0.1 ) +
-    labs(
-      x = element_blank(),
-      y = ylab
-    ) +
-    theme_bw()
-}
+mixture <- mcmc_results %>% 
+  ggplot(aes(x = mixture, colour = chain, groups=chain, fill = chain)) +
+  geom_histogram() +
+  labs(
+    x = "Mixture parameter",
+    y = "Posterior density"
+  ) +
+  theme_bw() +
+  theme(
+    strip.text.y = element_blank()
+  )
 
 
-plist <- list(
-  plot_parameter("scale", "Scale") + theme( axis.text.x = element_blank() ),
-  plot_parameter("shape", "Shape") + theme( axis.text.x = element_blank() ),
-  plot_parameter("mixture", "Mixture parameter") +
-    theme(
-      axis.text.x = element_text(angle = 90, hjust = 1, size = 8)
-      )
-)
-
-plot_posteriors <- ggarrange(plotlist = plist, ncol=1, heights = c(1,1,1.5), labels = 'AUTO')
+plot_posteriors <- ggarrange(
+  scale, shape, mixture,
+  ncol=3,
+  common.legend = TRUE, legend = 'bottom',
+  labels = "AUTO"
+  )
 
 ggsave(
   filename = "05_manuscript/posterior_distributions.eps",
   plot = plot_posteriors,
   device = "eps",
-  width = 8,
-  height = 22,
+  width = 16.9,
+  height = 8,
   units = "cm"
 )
