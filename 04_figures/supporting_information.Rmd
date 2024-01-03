@@ -87,7 +87,7 @@ hist(prior_values$scale, breaks = 30,
      ylab = "Prior density")
 
 # Shape parameters
-hist(prior_values$shape, breaks = 30, xlim=c(0,4), ylim = c(0,120),
+hist(prior_values$shape, breaks = 30, #xlim=c(0,4), ylim = c(0,120),
      main="Shape",
      ylab = "Prior density",
      xlab = "Shape parameter"
