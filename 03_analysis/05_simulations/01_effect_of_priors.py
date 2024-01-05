@@ -72,4 +72,3 @@ for i in tqdm(mcmc.index):
         # Write to disk
         with open(output_dir + "/effect_of_priors.csv", 'a') as f:
             sim_mating_events.to_csv(f, mode='a', header=f.tell()==0, float_format='%.4f', index=False)
-        

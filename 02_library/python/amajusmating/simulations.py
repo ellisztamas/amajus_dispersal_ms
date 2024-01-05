@@ -222,5 +222,4 @@ def simulate_mating_events(sim_data, q_real=0, q_param=None):
     output['q_real'] = q_real
     output['q_param'] = q_param
 
-
     return output

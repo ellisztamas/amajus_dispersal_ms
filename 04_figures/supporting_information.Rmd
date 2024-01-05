@@ -3,8 +3,11 @@ title: "Supporting information"
 author: "Thomas James Ellis, David Luke Field, Nicholas H. Barton"
 date: ""
 output: pdf_document
+header-includes: 
+  \usepackage{float} \floatplacement{figure}{H} 
+  \newcommand{\beginsupplement}{\setcounter{table}{0}  \renewcommand{\thetable}{S\arabic{table}} \setcounter{figure}{0} \renewcommand{\thefigure}{S\arabic{figure}}}
 ---
-
+\beginsupplement
 
 ```{r setup, message=FALSE, echo =FALSE }
 knitr::opts_chunk$set(
@@ -257,6 +260,24 @@ ggarrange(
 )
 
 ```
+
+```{r distance-vs-prob, fig.cap="Relationship between the distance between mothers and inferred fathers and the posterior probability of the mating event. Points are coloured separately to indicate whether family sizes are less or greater than one.", warning=FALSE}
+me %>% 
+  group_by(mother, father, distance) %>% 
+  summarise(
+    prob = mean(prob),
+    offspring = mean(offspring)
+  ) %>% 
+  mutate(`Family size` = ifelse(offspring >=1, "One or more", "Less than one")) %>% 
+  ggplot(aes(x=distance, y = prob, colour=`Family size`)) +
+  geom_point() +
+  labs(
+    x = "Inter-mate distance",
+    y = "Posterior probability"
+  ) + 
+  theme_bw()
+```
+
 
 ```{r sd-gnd, fig.cap="Mean dispersal distances implied by the second moment of the generalised normal distribution based on scale and shape parameters from MCMC chains for six prior scenarios."}
 
