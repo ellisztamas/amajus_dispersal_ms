@@ -32,13 +32,13 @@
 \author{
 	\authorstyle{
         Thomas James Ellis\textsuperscript{1,2},
-        David Luke Field, \textsuperscript{1,3,4},
+        David Luke Field, \textsuperscript{3,4},
         Nicholas H. Barton\textsuperscript{1,*}} % Authors
 	\newline\newline % Space before institutions
 	\textsuperscript{1}\institution{Institute of Science and Technology Austria, 2234 Klosterneuburg, Austria}\\ % Institution 1
 	\textsuperscript{2}\institution{Gregor Mendel Institute of Molecular Plant Sciences, Doktor-Bohr-Gasse 3, 1030 Vienna, Austria}\\ % Institution 2
-	\textsuperscript{3}\institution{Edith Cowen University, Perth, Australia}\\ % Institution 3
-    \textsuperscript{4}\institution{Applied BioSciences, Macquarie University, NSW 2109, Australia}\\ % Institution 4
+	\textsuperscript{3}\institution{Applied Biosciences, Macquarie University, Sydney, New South Wales, Australia}\\ % Institution 3
+    \textsuperscript{4}\institution{School of Science, Edith Cowan University, Joondalup, Western Australia, Australia}\\ % Institution 4
     \textsuperscript{*}\institution{To whom correspondence should be addressed: nick.barton@ist.ac.at} 
 }
 
@@ -94,8 +94,8 @@ By inferring pedigree relationships and dispersal jointly we can incorporate the
 
 Several methods exist for the joint inference of parental relationships and other parameters.
 Various approaches have been described to jointly infer sibling relationships with the parentage or paternity of those sibships (e.g. \cite{emery2001assignment, thomas2002sibship, jones2007estimating, wang2004sibship, anderson2016bayesian, huisman2017pedigree}).
-Another approach is to include data about other biological parameters that might influence mating, such as relevant phenotypes or spatial information (\cite{neff2001bayesian, hadfield2006towards}).
-This is especially appealling because it allows us to directly address biologically relevant relationships between traits of interest and mating patterns.
+Another approach is to include data about other biological parameters that might influence mating, such as relevant phenotypes or spatial information (\cite{neff2001bayesian, hadfield2006towards}), including several studies directly modelling dispersal (e.g. \textcite{adams1992using, smouse1999parentage, jones2003maximum, oddou2005pollen}).
+This is especially appealing because it allows us to directly address biologically relevant relationships between traits of interest and mating patterns.
 These approaches typically rely on an iterative algorithm such as simulated annealing or Monte-Carlo Markov chains (MCMC) to explore different pedigree structures.
 This is time-consuming, especially for large samples, and there is no guarantee that the full space of plausible pedigree structures can be explored.
 Moreover, we currently lack a framework for utilising all three sources of information - parentage, sibships and population parameters - in a single joint analysis.
@@ -472,8 +472,13 @@ We thank a large number of field volunteers for maintaining the population sampl
 
 \section{Data availability}
 
-Data and code to recreate the analyses are available from Zenodo (DOI:10.5281/zenodo.10031927).
+Data and code to recreate the analyses are available from Zenodo (DOI:  DOI: 10.5281/zenodo.10462674). A supplemental file listing inferred mating events is included as a supplementary file.
 
+\section{Author contributions}
+
+TJE sampled seeds and processed seeds, designed the method, analysed the data and wrote the manuscript.
+DLF led the collection of the demographic data of the hybrid zone, designed the SNP panel.
+DLF and NHB provided critical feedback on the manuscript. 
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------
