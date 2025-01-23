@@ -1,5 +1,46 @@
 # Change log
 
+## Simulate accuracy of paternity using observed family sizes
+
+23rd January 2025
+
+A major rewrite of the simulations to focus on what information you get from 
+paternity, sibships and population parameters. I removed the stuff about
+priors on q, because this is not particularly interesting.
+
+I now simulate cases where dispersal and genetics are very informative, somewhat
+informative and very informative.
+* dispersal over a ~3, 30 or 300 metres
+* 40, 50, or 60 markers.
+* 10, 30 or 50% missing fathers.
+
+The number of families for each mother is the inferred number of mating events
+from the empircal dataset.
+
+The main changes to the code are to allow for different numbers of markers,
+a reformat of how 'missing' fathers are purged, and functions to calculate 
+accuracy of mating-event reconstruction based on paternity alone (taking the
+most-probable candidate of each progeny); paternity plus sibships; and paternity,
+sibships and phenotype information together.
+
+Accuracy is measured as
+1. the probability that a mating event with >=1 offspring is correct
+2. the probability that a mating event with < offspring is correct
+3. the proportion of offspring assigned to a missing father.
+
+
+## Assortment or selection
+
+I want to check for evidence of selection or assortment by comparing with nearest
+neighbours to each apparent father
+
+Make a matrix of all pairwise distances
+Get the index position of the minimum row for each column
+Use that to slice candidate names to get a vector of nearest candidates to each real dad.
+For the two lists, add flower colour of mother and father
+????
+Profit.
+
 ## Asymmetry and updated results
 
 9th October 2023
