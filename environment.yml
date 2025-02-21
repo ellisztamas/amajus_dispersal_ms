@@ -12,5 +12,5 @@ dependencies:
   - ipykernel
   - pip:
     - faps
-    - -e 02_library/python
+    - 02_library/python
     - wquantiles

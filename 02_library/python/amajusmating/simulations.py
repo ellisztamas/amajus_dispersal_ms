@@ -21,8 +21,9 @@ def draw_sires(data, model, mating_events):
         ['missing', 'shape', 'scale', 'mixture', 'assortment'] and values 
         floats giving initial values for those parameters, within appropriate
         boundaries.
-    mating_events: pandas.DataFrame
-        Dataframe listing mating events. Usually this is the output of
+    mating_events: int or pandas.DataFrame
+        Either a single integer giving the number of mating events per mother or
+        a dataframe listing mating events. Usually this is the output of
         `amajusmating.mating.mating_over_chains()`. At a minimum it should list
         columns 'mother', 'father', 'offspring' (number of offspring in each
         family).
@@ -36,12 +37,8 @@ def draw_sires(data, model, mating_events):
     # Include mating probabilities in faps_data object
     data.update_covariate_probs(model)
     
-    # copy rows of dispersal probabilities to match the number of mating events
-    ix = [ np.where(x == np.array(data.mothers))[0][0] for x in mating_events['mother'] ]
-
-    assert len(ix) == mating_events.shape[0]
-
     # Zip together family sizes, and mating probabilities to iterate over later
+    ix = [ np.where(x == np.array(data.mothers))[0][0] for x in mating_events['mother'] ]
     probs = np.exp(data.covariates['dispersal'][ix])
     
     # For each mother, draw a sample of pollen donors in proportion to their distance
@@ -102,7 +99,7 @@ def simulate_genotypes(mating_events, genotypes, mu):
 
     return sim_progeny
 
-def simulate_dataset(data, model, mating_events, genotypes, mu, nloci):
+def simulate_dataset(data, model, mating_events, genotypes, mu, nloci, noffspring=None):
     """
     Simulate a set of mating events, generate offspring genotypes, and calculate
     paternity arrays.
@@ -129,6 +126,10 @@ def simulate_dataset(data, model, mating_events, genotypes, mu, nloci):
         donors.
     mu: float
         An estimate of the per-locus genotyping error rate.
+    noffspring: int
+        Optional argument giving a fixed full-sib family size.
+        If None, observed family sizes from `mating_events` for each mother are
+        used.
     
     Returns
     =======
@@ -140,12 +141,16 @@ def simulate_dataset(data, model, mating_events, genotypes, mu, nloci):
         'paternity_array' : Dict of faps.paternityArray objects for each 
             maternal family.
     """
+    # noffspring is an optional integer. If None, use observed family sizes.
+    if noffspring is None:
+        noffspring = mating_events['offspring']
+
     sim_data = {}
     # Table of simulated mating events giving the mother, father and family size
     sim_data['mating_events'] = pd.DataFrame({
         'mother' : mating_events['mother'],
         'father' : draw_sires(data, model, mating_events),# Draw candidate pollen donors for each mother.
-        'offspring': mating_events['offspring']
+        'offspring': noffspring
     })
 
     # Simulate genotypes
@@ -206,7 +211,55 @@ def remove_fathers(sim_data, prop_to_purge):
     for k in sim_data['paternity_array'].keys():
         sim_data['paternity_array'][k].purge = fathers_to_purge # Set log likelihoods for purged candidates to -Inf
 
-def mating_events_paternity_only(sim_data):
+    return fathers_to_purge
+
+def paternity_trios_only(sim_data):
+    """
+    Table of mating events inferred from paternity only.
+
+    This takes the most likely candidate father of each individual, including
+    missing fathers, and returns a data frame of unique candidates and the 
+    number of offspring belonging to each.
+
+    Parameters
+    ==========
+    sim_data: dict
+        The output of simulate_dataset
+
+    Returns
+    =======
+    A dataframe giving the mother, inferred father and inferred number of offspring
+    """
+    inferred_paternity = {}
+    for k in sim_data['paternity_array'].keys():
+        # ID of the top candidates
+        max_ix = np.argmax(sim_data['paternity_array'][k].prob_array(), 1)
+
+        # ID and posterior probability of the top candidate.
+        inferred_paternity[k] = pd.DataFrame({
+            'top_candidates' : sim_data['candidates'][max_ix],
+            'prob_paternity' : np.max(
+                sim_data['paternity_array'][k].prob_array(), axis=1
+                )
+        })
+        
+    # Concatenate and fix the names to match other functions
+    inferred_paternity = pd.concat(inferred_paternity).reset_index()
+    inferred_paternity = inferred_paternity.rename(
+        columns={
+            'level_0':'mother',
+            'top_candidates' : 'candidate_1',
+            'prob_paternity' : 'logprob_1'
+            })
+    # Ensure missing fathers are labelled 'missing' to match other functions
+    inferred_paternity.loc[inferred_paternity['candidate_1'] == "nan", 'candidate_1'] = "missing"
+    
+    return inferred_paternity
+
+
+
+        
+def mating_events_trios_only(sim_data):
     """
     Table of mating events inferred from paternity only.
 
@@ -225,13 +278,21 @@ def mating_events_paternity_only(sim_data):
     """
     inferred_mating_events = []
     for k in sim_data['paternity_array'].keys():
+        # ID of the top candidates
         max_ix = np.argmax(sim_data['paternity_array'][k].prob_array(), 1)
         top_candidates = sim_data['candidates'][max_ix]
+        # Posterior probability of the top candidates.
+        # Where this is the same for multiple offspring, take the maximum
+        prob_paternity = np.exp(np.max(
+            sim_data['paternity_array'][k].prob_array(), 1
+            ))
+        max_prob_paternity =[ prob_paternity[top_candidates == x].max() for x in np.unique(top_candidates)]
 
         mating_table = pd.DataFrame({
             'mother'    : k,
             'father'    : np.unique(top_candidates),
-            'offspring' : np.unique(top_candidates, return_counts = True)[1]
+            'prob'      : max_prob_paternity,
+            'offspring' : np.unique(top_candidates, return_counts = True)[1],
         })
         inferred_mating_events.append(mating_table)
 
@@ -240,10 +301,9 @@ def mating_events_paternity_only(sim_data):
     return inferred_mating_events
 
 
-def accuracy_of_paternity(real_mating_events, inferred_mating_events):
+def accuracy_of_mating(real_mating_events, inferred_mating_events):
     """
-    Compare mating-event reconstruction by three methods for a single table of
-    inferred mating events.    
+    Evalulate the accuracy of mating event inference.    
 
     Parameters
     ==========
@@ -270,21 +330,89 @@ def accuracy_of_paternity(real_mating_events, inferred_mating_events):
     
     # Get the probabilities that mating events with more or less than one offspring are real
     # Filter mating events with an inferred father
-    inferred_mating_events = merge_inferred_and_real_events.loc[merge_inferred_and_real_events['father'] != 'nan']
+    apparent_mating_events = merge_inferred_and_real_events.loc[merge_inferred_and_real_events['father'] != 'nan']
     # # Boolean vector indicating if the inferred event was correct.
-    inferred_mating_events['is_real'] = inferred_mating_events['offspring_real'].notna()
+    apparent_mating_events['is_real'] = apparent_mating_events['offspring_real'].notna()
+    
+    # Get the raw probability that an inferred mating event is correct, ignoring probabilities
+    arith_prob_correct = apparent_mating_events['is_real'].mean()
+    # Get the prob a mating event is correct, weight by posterior probability
+    weighted_sum_correct  = (apparent_mating_events['prob'] * apparent_mating_events['is_real']).sum() 
+    weighted_prob_correct = weighted_sum_correct / apparent_mating_events['prob'].sum()
+    # Calculate the probabilities that a mating event is correct if the posterior
+    # probability 1, or less than 1.
+    true_if_pp_is1 = apparent_mating_events.loc[apparent_mating_events['prob'] >= 1, 'is_real'].mean()
+    true_if_pp_lt1 = apparent_mating_events.loc[apparent_mating_events['prob'] <  1, 'is_real'].mean()
+    # Calculate the probabilities that a mating event is correct if the posterior
+    # probability 0.99, or less than 0.99.
+    true_if_pp_is99 =apparent_mating_events.loc[apparent_mating_events['prob'] >= 0.99, 'is_real'].mean()
+    true_if_pp_lt99 = apparent_mating_events.loc[apparent_mating_events['prob'] < 0.99, 'is_real'].mean()
     # Probabilities that families of more or less than one are correct
-    true_if_ge1 = inferred_mating_events.loc[inferred_mating_events['offspring_inf'] >=1, 'is_real'].mean()
-    true_if_lt1 = inferred_mating_events.loc[inferred_mating_events['offspring_inf'] < 1, 'is_real'].mean()
-
+    true_if_offs_ge1 = apparent_mating_events.loc[apparent_mating_events['offspring_inf'] >=1, 'is_real'].mean()
+    true_if_offs_lt1 = apparent_mating_events.loc[apparent_mating_events['offspring_inf'] < 1, 'is_real'].mean()
+    
     # Get the proportion of offspring that are assigned to a missing father. 
     n_unassigned = merge_inferred_and_real_events.loc[
         merge_inferred_and_real_events['father'] == 'nan', "offspring_inf"
         ].sum()
     p_unassigned = n_unassigned / merge_inferred_and_real_events['offspring_inf'].sum()
     
-    return [true_if_ge1, true_if_lt1, p_unassigned]
+    return {
+        "arith_prob_correct"    : arith_prob_correct,
+        "weighted_prob_correct" : weighted_prob_correct,
+        "true_if_pp_is1"  : true_if_pp_is1,
+        'true_if_pp_lt1'  : true_if_pp_lt1,
+        "true_if_pp_is99" : true_if_pp_is99,
+        'true_if_pp_lt99' : true_if_pp_lt99,
+        'true_if_offs_ge1': true_if_offs_ge1,
+        'true_if_offs_lt1': true_if_offs_lt1,
+        'p_unassigned'    : p_unassigned
+    }
 
+
+def accuracy_of_paternity(sim_data, inferred_paternity:pd.DataFrame, fathers_to_purge:list=[])->pd.DataFrame:
+    """
+    Evalulate the accuracy of paternity inference based on the most likely
+    candidate of each offspring.
+
+    Parameters
+    ==========
+    sim_data: pd.DataFrame
+        Table of correct mating events from simulate_dataset.
+    inferred_paternity: pd.DataFrame
+        Table of inferred paternity (the output of faps.summarise_paternity).
+
+    Returns
+    =======
+    A dict of three floats giving:
+        1. the number of most likely candidates that are the true father.
+        2. the number of most likely candidates that are not the true father.
+        3. the number of offspring correctly assigned as having a missing father.
+        4. the number of offspring incorrectly assigned as having a missing father.
+    """
+    true_fathers = [ v.fathers for v in sim_data['genotypes'].values() ]
+    true_fathers = [x for y in true_fathers for x in y]
+
+    ip = inferred_paternity # alias, because it makes the rest much easier to read
+    ip['true_father'] = true_fathers
+
+    # When fathers have been removed, set true father to 'missing'
+    ip.loc[ip['true_father'].isin(fathers_to_purge), 'true_father'] = "missing"
+    # Whether the most likely assignments are correct, and/or is to a missing father
+    ip['correct'] = ip['true_father'] == ip['candidate_1']
+    ip['missing'] = ip['candidate_1'] == "missing"
+
+    # Boolean Series for different True/False Positive/Negative outcomes
+    outcomes_bool = {
+        'true_pos'  : (~ip['missing']) &  ip['correct'],
+        'false_pos' : (~ip['missing']) & ~ip['correct'],
+        'true_neg'  : ( ip['missing']) &  ip['correct'],
+        'false_neg' : ( ip['missing']) & ~ip['correct']
+    }
+    # Integer sums of each outcome.
+    outcomes = { k:v.sum() for k,v in outcomes_bool.items() }
+
+    return outcomes
 
 
 def test_paternity_power(sim_data, prop_to_purge):
@@ -296,7 +424,7 @@ def test_paternity_power(sim_data, prop_to_purge):
     2. paternity plus sibships; and paternity,
     3. sibships and phenotype information together.
 
-    This then runs accuracy_of_paternity on each set of inferred mating events.
+    This then runs accuracy_of_mating on each set of inferred mating events.
 
     Parameters
     ==========
@@ -318,7 +446,7 @@ def test_paternity_power(sim_data, prop_to_purge):
     """
 
     # Set the likelihood for a sample of fathers to zero
-    remove_fathers(sim_data, prop_to_purge)
+    fathers_to_purge = remove_fathers(sim_data, prop_to_purge)
 
     # Cluster into sibships with and without covariate information.
     with warnings.catch_warnings():
@@ -326,29 +454,37 @@ def test_paternity_power(sim_data, prop_to_purge):
         sibship_clusters_genetics_only   = fp.sibship_clustering(sim_data['paternity_array'], use_covariates=False)
         sibship_clusters_with_covariares = fp.sibship_clustering(sim_data['paternity_array'], use_covariates=True)
 
-    # Summarise mating events
-    # Return table giving the mother, inferred father, and number of offspring for 
-    # 1.paternity only
-    # 2. sibships + paternity
-    # 3. paternity, sibships and covariate information
+    # Summarise Mating events
     inferred_mating_tables = {
-        'paternity' : mating_events_paternity_only(sim_data),
+        'paternity' : mating_events_trios_only(sim_data),
         'sibships'  : fp.summarise_sires(sibship_clusters_genetics_only),
         'full'      : fp.summarise_sires(sibship_clusters_with_covariares)
     }
+    # Summarise paternity
+    inferred_paternity_tables = {
+        'paternity' : paternity_trios_only(sim_data),
+        'sibships'  : fp.summarise_paternity(sibship_clusters_genetics_only),
+        'full'      : fp.summarise_paternity(sibship_clusters_with_covariares)
+    }
 
-    # Calculate the probabilities that an inferred mating event is real, and the
-    # proportion of offspring assigned to a missing father.
-    # Returns three lists of length three, which as then flattened.
-    sim_results = []
+    # Assess the accuracy of mating-event inference
+    mating_results = []
     for k in inferred_mating_tables.keys():
-        sim_results.append(
-            accuracy_of_paternity(sim_data['mating_events'], inferred_mating_tables[k])
+        mating_results.append(
+            accuracy_of_mating(sim_data['mating_events'], inferred_mating_tables[k])
         )
-    sim_results = pd.DataFrame(
-        np.array(sim_results),
-        columns = ['true_ge1', 'true_lt1', 'missing']
+    mating_results = pd.DataFrame(mating_results)
+    mating_results.insert(0, 'data_type', inferred_mating_tables.keys())
+    # Assess the accuracy of paternity inference
+    paternity_results = []
+    for k in inferred_mating_tables.keys():
+        paternity_results.append(
+            accuracy_of_paternity(sim_data, inferred_paternity_tables[k], fathers_to_purge)
         )
-    sim_results.insert(0, 'data_type', inferred_mating_tables.keys())
+    paternity_results = pd.DataFrame(paternity_results)
+    paternity_results.insert(0, 'data_type', inferred_mating_tables.keys())
 
-    return sim_results
+    return {
+        'mating' : mating_results,
+        'paternity' : paternity_results
+    }
