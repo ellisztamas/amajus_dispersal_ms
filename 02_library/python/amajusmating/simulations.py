@@ -401,7 +401,7 @@ def accuracy_of_paternity(sim_data, inferred_paternity:pd.DataFrame, fathers_to_
     # Whether the most likely assignments are correct, and/or is to a missing father
     ip['correct'] = ip['true_father'] == ip['candidate_1']
     ip['missing'] = ip['candidate_1'] == "missing"
-
+    
     # Boolean Series for different True/False Positive/Negative outcomes
     outcomes_bool = {
         'true_pos'  : (~ip['missing']) &  ip['correct'],
@@ -410,7 +410,9 @@ def accuracy_of_paternity(sim_data, inferred_paternity:pd.DataFrame, fathers_to_
         'false_neg' : ( ip['missing']) & ~ip['correct']
     }
     # Integer sums of each outcome.
-    outcomes = { k:v.sum() for k,v in outcomes_bool.items() }
+    # outcomes = { k:v.sum() for k,v in outcomes_bool.items() }
+    outcomes = { k : np.exp(ip.loc[v, 'logprob_1']).sum() for k,v in outcomes_bool.items() }
+    
 
     return outcomes
 

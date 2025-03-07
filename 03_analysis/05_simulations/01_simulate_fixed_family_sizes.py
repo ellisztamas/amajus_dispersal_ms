@@ -2,12 +2,7 @@
 Simulate and analyse datasets using the observed parental genotypes using 
 a fixed number of offspring per full-sib family.
 
-Returns a data frame giving:
-1. The probability that an inferred mating event is correct, given that family
-    size is >= 1.
-2. The probability that an inferred mating event is correct, given that family
-    size is < 1.
-3. The proportion of offspring assigned to missing fathers.
+This returns two CSV files for mating and paternity accuracies.
 """
 
 from amajusmating import simulations as sim
@@ -31,8 +26,11 @@ mating_events = mating_events.\
 # Trim mating events with low support
 mating_events = mating_events.loc[(mating_events['prob'] >= 1)]
 
-# Empty CSV file to store the output
-mating_file="03_analysis/05_simulations/simulate_fixed_family_sizes_mating.csv"
+# Empty CSVs file to store the output
+output_dir = os.path.dirname(os.path.abspath(__file__))+'/output/'
+os.makedirs(output_dir, exist_ok=True)
+# Mating events
+mating_file="03_analysis/05_simulations/output/simulate_fixed_family_sizes_mating.csv"
 pd.DataFrame(
     {}, columns=[
         'rep', 'scale', 'nloci', 'prop_purged', 'family_size', 'data_type', 
@@ -43,7 +41,7 @@ pd.DataFrame(
         'missing']
     ).\
         to_csv(mating_file, index=False)
-
+# Paternity
 paternity_file = "03_analysis/05_simulations/simulate_fixed_family_sizes_paternity.csv"
 pd.DataFrame({}, columns = [
     'rep', 'scale', 'nloci', 'prop_purged', 'family_size', 'data_type', 
@@ -51,8 +49,8 @@ pd.DataFrame({}, columns = [
 ]). to_csv(paternity_file, index=False)
 
 # Simulation parameters
-nreps = 30
-offs_values = [1,2,3]
+nreps = 100
+offs_values = [1,3,5]
 scale_values = [3,30,300]
 nloci_values = [40, 50, 60]
 q_values = [0.1, 0.3, 0.5]
