@@ -2,8 +2,7 @@
 
 """
 Script to run joint analysis of paternity, sibships and dispersal by Metropolis-
-Hastings MCMC. This keeps the proportion of missing fathers fixed at 0.32 and
-allows lambda (the mixture parameter for dispersal) to vary.
+Hastings MCMC.
 
 Tom Ellis, 3rd April 2023
 """
@@ -24,10 +23,10 @@ args = parser.parse_args()
 exec(open('03_analysis/01_data_formatting/setup_FAPS_GPS.py').read())
 
 # INITIALISE THE MODEL
-nreps = 4000 # Total number of iterations to run
+nreps = 3000 # Total number of iterations to run
 thin  = 1 # How often to write samples.
 max_distance = np.inf # set a maximum dispersal distance
-output_dir = os.path.dirname(os.path.abspath(__file__))+'/output_no_thinning/'
+output_dir = os.path.dirname(os.path.abspath(__file__))+'/output/'
 os.makedirs(output_dir, exist_ok=True)
 
 np.random.seed(87)
