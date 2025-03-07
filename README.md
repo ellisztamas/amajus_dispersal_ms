@@ -32,8 +32,7 @@ A conda environment file `environment.yml` is provided to make sure other users
 can use the same packages as were used to run the original analyses.
 Assuming `conda` is installed on your machine 
 (instructions [here](https://conda.io/projects/conda/en/latest/user-guide/install/index.html)),
-install the environment with
-
+install the environment from the project root directory with
 ```
 conda env create -f environment.yml
 ```

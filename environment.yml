@@ -3,7 +3,7 @@ channels:
   - defaults
 dependencies:
   - pip
-  - numpy
+  - numpy==1.26
   - scipy
   - pandas
   - bottleneck>=1.3.6
@@ -13,5 +13,5 @@ dependencies:
   - ipykernel
   - pip:
     - faps
-    - -e 02_library/python
+    - 02_library/python
     - wquantiles
