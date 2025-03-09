@@ -24,7 +24,7 @@ exec(open('03_analysis/01_data_formatting/setup_FAPS_GPS.py').read())
 
 # INITIALISE THE MODEL
 nreps = 3000 # Total number of iterations to run
-thin  = 1 # How often to write samples.
+thin  = 10 # How often to write samples.
 max_distance = np.inf # set a maximum dispersal distance
 output_dir = os.path.dirname(os.path.abspath(__file__))+'/output/'
 os.makedirs(output_dir, exist_ok=True)

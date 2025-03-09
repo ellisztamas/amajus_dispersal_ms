@@ -52,7 +52,7 @@ pd.DataFrame({}, columns = [
 nreps = 100
 offs_values = [1,3,5]
 scale_values = [3,30,300]
-nloci_values = [40, 50, 60]
+nloci_values = [40, 53, 67]
 q_values = [0.1, 0.3, 0.5]
 total_simulations = nreps * len(offs_values) * len(scale_values) * len(nloci_values) * len(q_values)
 

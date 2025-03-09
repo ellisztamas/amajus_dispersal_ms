@@ -12,9 +12,6 @@
 #SBATCH --mem-per-cpu=2G
 
 # ENVIRONMENT #
-# module load build-env/2020
-module load anaconda3/2019.03
-source $EBROOTANACONDA3/etc/profile.d/conda.sh
-conda activate faps
+source activate amajus_mating_ms
 
 srun python 03_analysis/05_simulations/01_simulate_fixed_family_sizes.py
