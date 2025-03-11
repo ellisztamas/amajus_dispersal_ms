@@ -286,7 +286,7 @@ def mating_events_trios_only(sim_data):
         prob_paternity = np.exp(np.max(
             sim_data['paternity_array'][k].prob_array(), 1
             ))
-        max_prob_paternity =[ prob_paternity[top_candidates == x].max() for x in np.unique(top_candidates)]
+        max_prob_paternity =[ prob_paternity[top_candidates == x].mean() for x in np.unique(top_candidates)]
 
         mating_table = pd.DataFrame({
             'mother'    : k,
