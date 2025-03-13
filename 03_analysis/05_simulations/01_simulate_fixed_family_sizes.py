@@ -30,7 +30,7 @@ mating_events = mating_events.loc[(mating_events['prob'] >= 1)]
 output_dir = os.path.dirname(os.path.abspath(__file__))+'/output/'
 os.makedirs(output_dir, exist_ok=True)
 # Mating events
-mating_file="03_analysis/05_simulations/output/simulate_fixed_family_sizes_mating.csv"
+mating_file="03_analysis/05_simulations/output/sims_mating.csv"
 pd.DataFrame(
     {}, columns=[
         'rep', 'scale', 'nloci', 'prop_purged', 'family_size', 'data_type', 
@@ -42,14 +42,14 @@ pd.DataFrame(
     ).\
         to_csv(mating_file, index=False)
 # Paternity
-paternity_file = "03_analysis/05_simulations/simulate_fixed_family_sizes_paternity.csv"
+paternity_file = "03_analysis/05_simulations/output/sims_paternity.csv"
 pd.DataFrame({}, columns = [
     'rep', 'scale', 'nloci', 'prop_purged', 'family_size', 'data_type', 
     'true_pos', "false_pos", "true_neg", "false_neg"
 ]). to_csv(paternity_file, index=False)
 
 # Paternity
-dispersal_file = "03_analysis/05_simulations/simulate_fixed_family_sizes_paternity.csv"
+dispersal_file = "03_analysis/05_simulations/output/sims_dispersal.csv"
 pd.DataFrame({}, columns = [
     'rep', 'scale', 'nloci', 'prop_purged', 'family_size', 'data_type', 'deviation'
 ]). to_csv(paternity_file, index=False)
