@@ -71,7 +71,7 @@ def run_iteration(rep):
         for scale in scale_values:
             model={
                 "missing" : 0.5,
-                "mixture" : 0.9,
+                "mixture" : 0.95,
                 "scale"   : scale,
                 "shape"   : 1
             }
