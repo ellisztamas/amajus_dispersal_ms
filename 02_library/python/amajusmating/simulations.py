@@ -178,6 +178,13 @@ def simulate_dataset(data, model, mating_events, genotypes, mu, nloci, noffsprin
     sim_data['candidates'] = np.array(data.candidates)
     sim_data['candidates'] = np.append(sim_data['candidates'], "nan")
 
+    # Add a dataframe of distances
+    sim_data['distance_df'] = pd.DataFrame({
+        'mother'   : np.repeat(list(data.mothers), data.n_candidates),
+        'father'   : np.tile(data.candidates, len(data.mothers)),
+        'distance' : data.distances.flatten()
+    })
+
     return sim_data
 
 def remove_fathers(sim_data, prop_to_purge):
@@ -255,9 +262,6 @@ def paternity_trios_only(sim_data):
     inferred_paternity.loc[inferred_paternity['candidate_1'] == "nan", 'candidate_1'] = "missing"
     
     return inferred_paternity
-
-
-
         
 def mating_events_trios_only(sim_data):
     """
@@ -286,7 +290,7 @@ def mating_events_trios_only(sim_data):
         prob_paternity = np.exp(np.max(
             sim_data['paternity_array'][k].prob_array(), 1
             ))
-        max_prob_paternity =[ prob_paternity[top_candidates == x].mean() for x in np.unique(top_candidates)]
+        max_prob_paternity =[ prob_paternity[top_candidates == x].max() for x in np.unique(top_candidates)]
 
         mating_table = pd.DataFrame({
             'mother'    : k,
@@ -416,6 +420,22 @@ def accuracy_of_paternity(sim_data, inferred_paternity:pd.DataFrame, fathers_to_
 
     return outcomes
 
+def accuracy_median_dispersal(sim_data, inferred_mating_tables):
+    """
+    Calculate the median deviation in inferred dispersal distances from the true
+    dispersal distances.
+    """
+    real_distances = pd.merge(sim_data['mating_events'], sim_data['distance_df'], how='left', on=['mother', 'father'])
+    real_median = real_distances['distance'].median()
+
+    deviation = {}
+    for k, v in inferred_mating_tables.items():
+        distances = pd.merge(v, sim_data['distance_df'], how='left', on=['mother', 'father'])
+        inferred_median = distances.loc[distances['offspring'] >=1, 'distance'].median()
+        deviation[k] = inferred_median - real_median
+
+    return deviation
+
 
 def test_paternity_power(sim_data, prop_to_purge):
     """
@@ -454,19 +474,19 @@ def test_paternity_power(sim_data, prop_to_purge):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore") # Suppress warnings about singleton sibships
         sibship_clusters_genetics_only   = fp.sibship_clustering(sim_data['paternity_array'], use_covariates=False)
-        sibship_clusters_with_covariares = fp.sibship_clustering(sim_data['paternity_array'], use_covariates=True)
+        sibship_clusters_with_covariates = fp.sibship_clustering(sim_data['paternity_array'], use_covariates=True)
 
     # Summarise Mating events
     inferred_mating_tables = {
         'paternity' : mating_events_trios_only(sim_data),
         'sibships'  : fp.summarise_sires(sibship_clusters_genetics_only),
-        'full'      : fp.summarise_sires(sibship_clusters_with_covariares)
+        'full'      : fp.summarise_sires(sibship_clusters_with_covariates)
     }
     # Summarise paternity
     inferred_paternity_tables = {
         'paternity' : paternity_trios_only(sim_data),
         'sibships'  : fp.summarise_paternity(sibship_clusters_genetics_only),
-        'full'      : fp.summarise_paternity(sibship_clusters_with_covariares)
+        'full'      : fp.summarise_paternity(sibship_clusters_with_covariates)
     }
 
     # Assess the accuracy of mating-event inference
@@ -486,7 +506,15 @@ def test_paternity_power(sim_data, prop_to_purge):
     paternity_results = pd.DataFrame(paternity_results)
     paternity_results.insert(0, 'data_type', inferred_mating_tables.keys())
 
+    # Assess accuarcy of median dispersal
+    median_deviation = accuracy_median_dispersal(sim_data, inferred_mating_tables)
+    dispersal_results = pd.DataFrame({
+        'data_type' : median_deviation.keys(),
+        'deviation' : median_deviation.values()
+        })
+
     return {
         'mating' : mating_results,
-        'paternity' : paternity_results
+        'paternity' : paternity_results,
+        'dispersal' : dispersal_results
     }

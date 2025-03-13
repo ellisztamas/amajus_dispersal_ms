@@ -48,6 +48,12 @@ pd.DataFrame({}, columns = [
     'true_pos', "false_pos", "true_neg", "false_neg"
 ]). to_csv(paternity_file, index=False)
 
+# Paternity
+dispersal_file = "03_analysis/05_simulations/simulate_fixed_family_sizes_paternity.csv"
+pd.DataFrame({}, columns = [
+    'rep', 'scale', 'nloci', 'prop_purged', 'family_size', 'data_type', 'deviation'
+]). to_csv(paternity_file, index=False)
+
 # Simulation parameters
 nreps = 100
 offs_values = [1,3,5]
@@ -89,6 +95,7 @@ def run_iteration(rep):
                     # Save to disk
                     sim_result['mating'].to_csv(   mating_file,    mode='a', index=False, header=False, float_format='%.3f')
                     sim_result['paternity'].to_csv(paternity_file, mode='a', index=False, header=False, float_format='%.3f')
+                    sim_result['dispersal'].to_csv(paternity_file, mode='a', index=False, header=False, float_format='%.3f')
                     
     t2 = time()
     time_for_this_rep = np.round((t2-t1)/60, 2)
