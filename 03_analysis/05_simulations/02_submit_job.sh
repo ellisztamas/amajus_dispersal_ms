@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # SLURM
-#SBATCH --job-name=03_effect_of_priors
+#SBATCH --job-name=sims_fixed_family_sizes
 #SBATCH --output=slurm/%x.out
 #SBATCH --error=slurm/%x.err
 #SBATCH --qos=short

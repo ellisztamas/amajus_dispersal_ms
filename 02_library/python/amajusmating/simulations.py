@@ -292,7 +292,7 @@ def mating_events_trios_only(sim_data):
             'mother'    : k,
             'father'    : np.unique(top_candidates),
             'prob'      : max_prob_paternity,
-            'offspring' : np.unique(top_candidates, return_counts = True)[1] * max_prob_paternity,
+            'offspring' : np.unique(top_candidates, return_counts = True)[1],
         })
         inferred_mating_events.append(mating_table)
 
