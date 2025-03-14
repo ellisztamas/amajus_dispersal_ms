@@ -5,7 +5,7 @@ library('tidyverse')
 gps <- read_csv("01_data/processed_GPS_positions.csv", col_types = 'cdd')
 
 fathers = read_csv(
-  "03_analysis/04_mating_events/output/01_mcmc_main/mating_events_over_chains.csv",
+  "03_analysis/04_mating_events/output/mating_events_over_chains.csv",
   col_types = 'iccdddddd'
   ) %>%
   filter(offspring >= 1, !is.na(father)) %>% 
@@ -44,7 +44,7 @@ map_plot <- map_data %>%
   )
 
 ggsave(
-  filename = "05_manuscript/map.eps",
+  filename = "05_manuscript/fig-map.eps",
   plot = map_plot,
   device = "eps",
   width = 16.9,

@@ -7,7 +7,7 @@ source("02_library/R/stat_ecdf_weighted.R")
 
 # Import data on mating events
 me <-read_csv(
-  "03_analysis/04_mating_events/output/01_mcmc_main/mating_events_over_chains.csv",
+  "03_analysis/04_mating_events/output/mating_events_over_chains.csv",
   col_types = cols()) %>% 
   filter( !is.na(father) ) # remove mating events with a missing father
 
@@ -50,24 +50,8 @@ inset_plot <- ggdraw() +
   draw_plot(linear_dispersal) + draw_plot_label("A") + 
   draw_plot(log_dispersal, x = 0.95, y = 0.95, width = 0.6, height = 0.6, hjust = 1, vjust = 1)
 
-
-  
-# # Summary plots of median dispersal and the number of sires >500m from the mother
-# plist <- list(
-#   plot_parameter("median_dispersal", "Median dispersal (m)")  + theme( axis.text.x = element_blank() ),
-#   plot_parameter("long_range_dispersal", "Sires >500m") + theme( axis.text.x = element_blank() ) + 
-#     theme(
-#       axis.text.x = element_text(angle = 90, hjust = 1, size = 7),
-#       axis.text.y = element_text(size = 8)
-#       )
-# )
-# # plot_summaries <- ggarrange(plotlist = plist, ncol=1, heights = c(1,1.2), labels = LETTERS[3:4])
-
-# Glue the inset plot and MCMC summaries together
-# dispersal_plot <- ggarrange(inset_plot, plot_summaries, ncol = 2, widths = c(5,3))
-
 # Save to disk.
-ggsave(filename = "05_manuscript/dispersal.eps", 
+ggsave(filename = "05_manuscript/fig-dispersal.eps", 
        plot = inset_plot,
        width = 112, 
        height = 120,
