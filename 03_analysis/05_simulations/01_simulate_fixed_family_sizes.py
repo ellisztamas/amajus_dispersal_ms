@@ -95,7 +95,7 @@ def run_iteration(rep):
                     # Save to disk
                     sim_result['mating'].to_csv(   mating_file,    mode='a', index=False, header=False, float_format='%.3f')
                     sim_result['paternity'].to_csv(paternity_file, mode='a', index=False, header=False, float_format='%.3f')
-                    sim_result['dispersal'].to_csv(paternity_file, mode='a', index=False, header=False, float_format='%.3f')
+                    sim_result['dispersal'].to_csv(dispersal_file, mode='a', index=False, header=False, float_format='%.3f')
                     
     t2 = time()
     time_for_this_rep = np.round((t2-t1)/60, 2)
