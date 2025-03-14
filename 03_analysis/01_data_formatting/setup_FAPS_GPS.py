@@ -13,7 +13,7 @@ Finally genotype and paternity arrays are split by maternal family.
 It returns a faps_data object with all the relevant information.
 """
 
-import numpy as n
+import numpy as np
 import faps as fp
 import pandas as pd
 from os.path import isfile
@@ -33,7 +33,7 @@ progeny = fp.read_genotypes('01_data/offspring_2012_genotypes.csv', mothers_col=
 adults  = fp.read_genotypes('01_data/parents_2012_genotypes.csv')
 # SNP Data cleaning.
 print("Filtering loci and individuals with poor marker data.")
-# remove individuals with >7.5% missing data
+# remove individuals with >20% missing data
 md = 0.2
 progeny = progeny.subset(individuals= progeny.missing_data('individual') < md)
 adults  = adults.subset(individuals= adults.missing_data('individual') < md)
