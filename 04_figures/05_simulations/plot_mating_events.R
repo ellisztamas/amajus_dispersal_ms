@@ -56,7 +56,7 @@ plot_lt1 <- sim_mating_events %>%
   facet_grid(family_size~prop_purged)
 
 plot_mating <- ggarrange(
-  plot_ge1, plot_lt1,
+  plot_lt1, plot_ge1,
   nrow=2, common.legend = TRUE, legend="right", labels = "AUTO"
   )
 
