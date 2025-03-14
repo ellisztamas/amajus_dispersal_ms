@@ -48,14 +48,14 @@ mixture <- mcmc_results %>%
 
 
 plot_posteriors <- ggarrange(
-  scale, shape, mixture,
+  shape, scale, mixture,
   ncol=3,
   common.legend = TRUE, legend = 'bottom',
   labels = "AUTO"
   )
 
 ggsave(
-  filename = "05_manuscript/posterior_distributions.eps",
+  filename = "05_manuscript/fig-posterior_distributions.eps",
   plot = plot_posteriors,
   device = "eps",
   width = 16.9,
