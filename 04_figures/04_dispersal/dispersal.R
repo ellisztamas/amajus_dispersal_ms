@@ -12,13 +12,13 @@ me <-read_csv(
   filter( !is.na(father) ) # remove mating events with a missing father
 
 # Histogram of disperal distances
-linear_dispersal <- me %>% 
+linear_dispersal <- me %>%
   filter(offspring >=1) %>%
   mutate(iter = as.factor(iter)) %>% 
   ggplot( aes(x = distance, weights = prob) ) +
   geom_histogram(aes(
     y = stat(count / 1000) ),
-    bins = 50, fill = 'white', colour = 'black',
+    binwidth = 30, fill = 'white', colour = 'black',
     boundary=0
   ) + 
   labs(
