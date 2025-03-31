@@ -62,13 +62,13 @@
 % \lettrineabstract{}
 
 \section{Abstract}
-The distribution of pollen dispersal distances sets the scale for plant population dynamics.
-A useful approach for inferring the distribution dispersal distances is to infer the distances between mates by paternity or parentage reconstruction.
-This is most powerful when information about multiple properties or data types are inferred in a joint analysis.
-We describe an approach to jointly infer paternity, sibling relationships and population parameters, with the example of the pollen dispersal kernel in a natural population of the yellow-flowered \textit{Antirrhinum majus striatum} and the magenta-flowered \textit{A. m. pseudomajus}.
-Pollen dispersal is leptokurtic, with half of mating events occurring within 30m, but with a long tail of mating events up to 747m.
-We also find tentative evidence that fathers tend to be to the East of mothers, indicating that there is a bias in pollen dispersal from \textit{A. m. pseudomajus} into \textit{A. m. striatum}.
-The scale of pollen dispersal is large enough that pollinators should encounter the full range of hybrid phenotypes in the hybrid zone, and would be sufficient for any pollinator-mediated selection to influence male or female fitness.
+Inferring pedigrees of wild populations is useful because it gives direct estimates of mating patterns and variance in reproductive success.
+Pedigree inference can be improved by including information about parentage shared between siblings, or by modelling phenotypes or population data related to mating.
+However, we currently lack a framework to infer paternity, sibship, and population in a single analysis.
+To address this we here extend a previous method Fractional Analysis of Paternity and Sibships to include population data.
+We illustrate this with the example of pollen dispersal in a natural hybrid zone population of the snapdragon \textit{Antirrhinum majus}.
+Pollen dispersal is leptokurtic, with half of mating events occurring within 30m, but with a long tail of mating events up to 759m.
+Using simulations we find that both sibship and population information substantially improve pedigree reconstruction, and that we can expect to resolve median dispersal distances with high accuracy.
 
 %----------------------------------------------------------------------------------------
 %	ARTICLE CONTENTS
@@ -89,16 +89,16 @@ Second, sibling-reconstruction approaches use information about alleles shared b
 Because sibling relationships are typically not known and there are a very large number of possible configurations to consider, a major challenge in sibship inference is to explore this space effectively.
 Genetic information shared between parents, offspring and between siblings are vital for reconstructing their relationships.
 
-Finally, mating patterns and differences in mating success often depend on additional population and phenotypic factors that are not related to genetics.
-Jointly modelling these processes with pedigree relationships can not only better resolve relationships between individuals, but is also often of direct interest itself \citep{neff2001bayesian, hadfield2006towards}.
+Finally, mating patterns and differences in mating success often depend on additional population and phenotypic parameters that are not related to genetics.
+Jointly modelling these processes with pedigree relationships can not only better resolve relationships between individuals, but provide more accurate estimates of population and phenotypic factors compared with post-hoc estimates. \citep{neff2001bayesian, hadfield2006towards}.
 Pollen dispersal is a good example of this.
-We expect nearby individuals to mate with one another more than with more distant individuals.
-By using as suitable model for how the probability of mating decays with distance we expect to weight inference to more likely candidate mates, but also to directly infer meaningful parameters about pollen flow \citep{adams1992using, jones2003maximum, oddou2005pollen, klein2008pollen, chybicki2013seeing}.
+We expect nearby individuals to mate with one another more often than with more distant individuals.
+By using a suitable model for how the probability of mating decays with distance we expect to weight inference to more likely candidate mates, but also to directly infer meaningful parameters about pollen flow \citep{adams1992using, jones2003maximum, oddou2005pollen, klein2008pollen, chybicki2013seeing}.
 A particularly well-established approach for this the the 'neighbourhood model' which jointly estimates parent-offspring relationships and dispersal distributions whilst also accounting for pollen immigration, incomplete sampling, variation in fertility and assortative mating \citep{adams1989mating, burczyk2004cautions, oddou2005pollen, chybicki2013seeing, gerard2006assortative, chybicki2018nmpi, chybicki2021identification}.
 Jointly modelling parent-offspring relationships with population parameters has great appeal because it allows us to directly address biologically relevant relationships between traits of interest and mating patterns.
 
-Augmenting parentage information with information about sibling relationships or population parameters is expected to increase the accuracy of pedigree reconstruction \citep{neff2001bayesian, wang2007parentage}.
-However, we currently lack a framework for utilising all three sources of information - parentage, sibships and population parameters - in a single joint analysis.
+Approaches exist for combining parentage with sibship information, and parentage with population parameters, and this additional information is expected to increase the accuracy of pedigree reconstruction \citep{neff2001bayesian, wang2007parentage, walling2010comparing}.
+However we currently lack a framework for utilising all three sources of information - parentage, sibships and population parameters - in a single joint analysis.
 Because of this, we also lack an understanding of the relative contribution of sibship and population parameters to pedigree inference, and how this changes depending on the data available and the biology of the system.
 We previously described a package Fractional Analysis of Paternity and Sibships (FAPS) to jointly infer of paternity and sibships (\cite{ellis2018efficient}).
 In this paper we describe how to include non-genetic information into the FAPS procedure, and use MCMC to update parameters for those data to jointly infer paternity, sibships and population parameters.
@@ -122,12 +122,12 @@ Using simulations we also characterise how the power to reconstruct paternity of
 	\label{fig:map} % Label for referencing with \ref{bear}
 \end{figure*}
 
-We examine a hybrid zone population of the snapdragon \textit{Antirrhinum majus} in the Spanish Pyrenees. Here, the yellow-flowered \textit{A. m. striatum} and the magenta-flowered \textit{A. m. pseudomajus} meet and hybridise to produce diverse recombinant phenotypes, including pink, white and orange flowers.
-The population grows along two parallel roads running East-West close to Rib\`{e}s de Freser (figure \ref{fig:map}). The ’lower’ road is at 1150-1200m above sea level, whilst the ’upper’ road climbs 1250-1500m, and is 500-1000m north of the lower road. Hybrids are mostly confined to a 1km ’core’ hybrid zone, with \textit{A. m. striatum}- and \textit{A. m. pseudomajus}-like plants becoming dominant to the West and East respectively. We surveyed as many flowering plants as we could find in June and July of 2012 (n=2124), and collected information on flower number and location using a Trimble GeoXT datalogger. We collected two to three leaves for DNA extraction and dried these in silica gel (Fischer Scientific). \textit{A. majus} grows in disturbed habitats such as roadsides and railways; they are rare in the established forest and pasture between the two roads, on the north-facing slope to the South, and on the high mountain peak to the North of the two roads (figure \ref{fig:map}. It thus is likely that we sampled the majority of the plants that flowered during the study period, although we cannot exclude that some flowering may have occurred before or after this. 
+We examine a hybrid zone population of the snapdragon \textit{Antirrhinum majus} ssp \textit{majus} in the Spanish Pyrenees. Here, the yellow-flowered \textit{A. m. majus} var \textit{striatum} and the magenta-flowered \textit{A. m. majus} var \textit{pseudomajus} meet and hybridise to produce diverse recombinant phenotypes, including pink, white and orange flowers \citep{whibley2004molecular}.
+The population grows along two parallel roads running East-West close to Rib\`{e}s de Freser (figure \ref{fig:map}). The ’lower’ road is at 1150-1200m above sea level, whilst the ’upper’ road climbs 1250-1500m, and is 500-1000m north of the lower road. Hybrids are mostly confined to a 1km ’core’ hybrid zone, with \textit{A. m. striatum}- and \textit{A. m. pseudomajus}-like plants becoming dominant to the West and East respectively. We surveyed as many flowering plants as we could find in June and July of 2012 (n=2124), and collected information on flower number and location using a Trimble GeoXT datalogger. We collected two to three leaves for DNA extraction and dried these in silica gel (Fischer Scientific). We also sampled one mature flower from each plant and scored this for yellow and magenta pigmentation as described by \cite{whibley2004molecular}. \textit{A. majus} grows in disturbed habitats such as roadsides and railways; they are rare in the established forest and pasture between the two roads, on the north-facing slope to the South, and on the high mountain peak to the North of the two roads (figure \ref{fig:map}). It thus is likely that we sampled the majority of the plants that flowered during the study period, although we cannot exclude that some flowering plants may have been missed. 
 
 Pollination is carried out exclusively by large bumblebees and carpenter bees who are large enough to open the flowers (\cite{vargas2010occluded, andalo2019prevalence}). \textit{A. majus} has a gametophytic self-incompatibility system, and self-pollinated seeds are very rare \parencite{surendranadh2022effects}. There are no detectable post-zygotic barriers between \textit{A. m. striatum} and \textit{A. m. pseudomajus} (\cite{andalo2010post}).
 
-In August 2012 we collected a single, mature, wild-pollinated fruit from each of 60 mothers (figure \ref{fig:map}). In order to minimise disturbance to the population we only sampled from plants which had set a minimum of five mature fruits. These mothers were chosen to represent an even sample of pigmentation genotypes, spread as evenly as possible across the core of the hybrid zone where hybrids are most dense, resulting in 10 \textit{A. m. striatum}-like, 17 \textit{A. m. pseudomajus}-like, and 33 hybrid-phenotype mothers.
+In August 2012 we collected a single, mature, wild-pollinated fruit from each of 60 mothers (figure \ref{fig:map}). In order to minimise disturbance to the population we only sampled from plants which had set a minimum of five mature fruits. These mothers were chosen to represent an even sample of pigmentation phenotypes, spread as evenly as possible across the core of the hybrid zone where hybrids are most dense, resulting in 10 \textit{A. m. striatum}-like, 17 \textit{A. m. pseudomajus}-like, and 33 hybrid-phenotype mothers.
 
 \subsubsection{Genotyping}
 
@@ -135,7 +135,7 @@ We grew seeds in 5cm plug trays filled with potting compost (Gramaflor) in a gre
 
 We genotyped tissue samples at 71 SNPs by KASPR sequencing (LGC Genomics).
 These SNPs are a subsample of a panel used for a wider survey of the hybrid zone (\cite{surendranadh2022effects}).
-Previous work identified the per-locus genotyping error rate in these data to be approximately $10^4$ (\cite{surendranadh2022effects}).
+Previous work identified the per-locus genotyping error rate in these data to be approximately $10^-4$ (\cite{surendranadh2022effects}).
 We removed 110 offspring that had missing data at more than 20\% of the SNPs.
 We also pruned 4 SNPs that showed more than 20\% missing data, or less than 15\% heterozygosity.
 This left us with a set of 1308 offspring from 60 maternal families and 2124 candidate pollen donors, with between three and 39 offspring per maternal family (mean=21.8), with 64 marker SNPs.
@@ -171,35 +171,36 @@ Rows in \textbf{G} sum to one, and describe a multinomial distribution of probab
     \Sigma_j^F g_{ij}g_{hj}
 \end{equation}
 
-that the \textit{i}\textsuperscript{th} and \textit{h}\textsuperscript{th} offspring are full siblings by summing over the probabilities that they share any one of the $F$ fathers. The similarity matrix is used to perform hierarchical clustering to identify plausible ways to partition offspring into families of possible full sibships, and the likelihood of each partition structure is estimated by Monte-Carlo simulation. The likelihood that candidate father \textit{j} is the father of putative full sibship \textit{k} is then
+that the \textit{i}\textsuperscript{th} and \textit{h}\textsuperscript{th} offspring are full siblings by summing over the probabilities that they share any one of the $F$ candidate fathers. The similarity matrix is used to perform hierarchical clustering to identify plausible ways to partition offspring into families of possible full sibships, and the likelihood of each partition structure is estimated by Monte-Carlo simulation. The likelihood that candidate father \textit{j} is the father of putative full sibship \textit{k} is then
 \begin{equation}\label{eqn:faps_lik_sibship}
-\Pi_i^n g_{ij}
+\frac{
+    \Pi_i^n g_{ij}
+    }{
+    \Sigma_j^F\Pi_i^n g_{ij}
+    }
 \end{equation}
 for all \textit{n} offspring in \textit{k}. FAPS returns a vector of probabilities (which sum to one) that each candidate is the father of sibship \textit{k}, or that the true father was not sampled. This is done for each plausible partition structure. This gives a distribution of possible partition structures and their likelihoods, and a distribution of paternity probabilities for each putative family within each partition structure.
 
-We can incorporate non-genetic information about paternity using a suitable function relating those data into probabilities of paternity.
+We can incorporate non-genetic information about paternity using a suitable function relating those data into probabilities of paternity \citep{hadfield2006towards}.
 In principle this can be done for any kind of data for which there is a suitable function relating the observed data for a set of candidate fathers to a probability of having mating with each mother, given a set of parameter values for that function. The goal is to find parameter values that best explain the data. For example, a standardised continuous phenotype $z$ could be modelled with the logistic function $1/(1+e^{\beta z})$, where $\beta$ describes the relationship between $z$ and male fertility.
 A categorical phenotype can be modelled as a multinomial vector of probabilities that sum to one.
 In this study we use matrix \textbf{D} of Euclidean distances between mothers and candidate fathers as a covariate, and model the probability $\Pr(d_{mj}|\theta)$ of a mating event occurring between mother \textit{m} and candidate \textit{j} who are distance $d_{mj}$ apart, based on a suitable model of pollen dispersal (see below).
-It is then straightforward to incorporate this into the procedure outlined above by modifying eqn. \ref{eqn:faps_similarity_matrix} to
+Assuming phenotypes are independent of marker genotypes it is then straightforward to incorporate this into the procedure outlined above by modifying eqn. \ref{eqn:faps_similarity_matrix} to
 \begin{equation}\label{eqn:pairwise_with_covariates}
 \Sigma_j^F \Pr(d_{mj} | \theta)g_{ij}g_{hj}
 \end{equation}
 and eqn. \ref{eqn:faps_lik_sibship} to
 \begin{equation}
 \label{sibship_with_covariates}
-\Pr(d_{mj} | \theta)\Pi_i^n g_{ij}
+\frac{
+    \Pr(d_{mj} | \theta)\Pi_i^n g_{ij}
+    }{
+    \Sigma_j^F \Pr(d_{mj} | \theta)\Pi_i^n g_{ij}
+    }
 \end{equation}
 
 Eqn. \ref{sibship_with_covariates} can then be used to estimate the likelihood of the partition structure by Monte-Carlo simulation, as previously described by \textcite{ellis2018efficient}.
 For a given set of dispersal parameters in $\theta$ the likelihood of the whole maternal family is then the sum of likelihoods for each possible partition. When there are multiple maternal families, the likelihood of the whole dataset given $\theta$ is the product of those likelihoods over each maternal family. When we update $\theta$, this likelihood will change, giving us a way to compare likelihoods of different dispersal parameter values and identify those most consistent with the data.
-
-A special case arises when it is known that offspring are unrelated, or that sibship structure is otherwise known. In this case the likelihood of the data can be calculated by summing the likelihoods of paternity for each candidate father on the $k^{th}$ full-sibship, and multiplying over all $K$ full sibships:
-\begin{equation}
-    \label{eqn:lik_if_no_structure}
-    \Pi_k^K\Sigma_j^F\Pr(d_{mj} | \theta)\Pi_i^n g_{ij}
-\end{equation}
-This obviates the need for likelihood estimation by Monte-Carlo simulation.
 
 \subsubsection{Pollen dispersal distribution}
 
@@ -212,10 +213,11 @@ A useful function for describing plant dispersal distributions is the generalise
 The function takes the forms of the standard exponential when $b=1$ and normal distribution when $b=2$. Values of $b<1$ reflect leptokurtic distributions with tails that decay more slowly than would be expected under the exponential distribution. Using $\theta={a,b}$, this provides a convenient function for calculating $\Pr(d_{mj} | \theta)$ because it allows for a long tail of long-distance migrants.
 
 Sometimes it may be that an unrelated candidate has a similar or higher probability of paternity of one or more offspring simply due to stochasticity in Mendelian sampling.
-Whereas true fathers are expected to be (on average) close to the mother, other candidates should be drawn at random from the population. This will inflate the apparent kurtosis in the data and bias $b$ downwards.
+Whereas true fathers are expected to be (on average) close to the mother, other candidates should be drawn at random from the population (although this is complicated if there is substantial spatial genetic structure).
+This will inflate the apparent kurtosis in the data and bias $b$ downwards.
 To accommodate this we modify \ref{eqn:GND} to model dispersal as a mixture of a generalised-normal and a uniform distribution:
 \begin{equation}\label{eqn:mixture_model}
-\Pr(d_{mj} | a,b,\lambda) = \lambda K e^{  (-\frac{d}{a} )^b } + \frac{1-\lambda}{F}
+\Pr(d_{mj} | a,b,\lambda) = \lambda e^{  (-\frac{d}{a} )^b } + \frac{1-\lambda}{F}
 \end{equation}
 where $F$ is the number of candidate fathers and $\lambda$ is a mixture parameter determining the proportion of the probability mass due to ’real’ dispersal.
 The uniform part of this mixture allows for signal coming from incorrect candidates without requiring the 'true' dispersal kernel to be unnecessarily leptokurtotic.
@@ -232,16 +234,15 @@ We prefer to focus on median dispersal distances because this is more intuitive 
 \subsubsection{Priors for dispersal parameters}
 
 We require prior distributions for dispersal parameters $a$, $b$ and $\lambda$.
-
 We used a log-normal prior for $b$ ($\ln b \sim N(\mu=0, \sigma = 0.5)$.
-This model allows for a range of shape values reflecting leptokurtosis to Gaussian dispersal, but is skeptical about very strong over- or under-dispersion in the dispersal distribution because prior probabilties approach zero as $b$ approaches 0 or 3 (figure S1).
+This model allows for a range of shape values reflecting leptokurtosis to Gaussian dispersal, but is weights against very strong over- or under-dispersion in the dispersal distribution because prior probabilities approach zero as $b$ approaches 0 or 3 (figure S1).
 We used a Gamma prior for $a$ because this describes positive continuous values, and because it is conjugate with the variance parameter of a Gaussian distribution.
 Because the effect of $a$ depends on $b$ and has no intuitive biological interpretation itself, we used prior simulations to choose a suitable parameterisation for $a$. We first simulated 10000 pairs of values for $a$ and $b$ from Gamma and log-normal distributions respectively. We then used each pair of simulated values to parameterise a generalised normal distribution, and simulated 1000 dispersal distances from that distribution, and visually examined the distribution for biological plausibility. We chose a Gamma distribution with shape=6 and scale=50, because this gave dispersal distributions with most dispersal occurring within 500m, but allowing for rare long-range dispersal events (figure S1).
 
 For $\lambda$, we use a beta distribution with parameters Beta(1.1, 1.1).
 This distribution approaches zero when $\lambda$ is close to zero or one, but is fairly flat in between.
 This implies that we do not expect that all the weight should be on either the generalised-normal or the uniform components of the mixture distribution in eqn. \ref{eqn:mixture_model}, but that we do not have strong prior beliefs about values between that.
-To examine the effect of modelling dispersal as a mixture model at all, we also repeated the MCMC with with $\lambda$ to set to one.
+To examine the effect of modelling dispersal as a mixture model at all, we also repeated the MCMC with $\lambda$ to set to one.
 
 \subsection{Inference}
 
@@ -262,21 +263,20 @@ Each set of fathers reflects a hypothetical set of mating events, and the probab
 This gives a list of mating events, with a posterior probability that each occurred, including an entry for offspring whose father was missing.
 The posterior estimate of offspring number is the number of offspring for each father in each father-sibship configuration weighted by the probability of the mating event.
 Note that the number and size of sibships are not necessarily integers because estimates are weighted averages over plausible sibship partition structures.
-In particular, hypothetical families can have posterior sizes less than one if the nominal number of offspring is one, but the posterior probability for the family is less than one.
-
 We inferred mating events in this way using eqn. \ref{eqn:faps_lik_sibship} based on dispersal parameter estimates from each of 1000 iterations of the MCMC output.
-We also calculated the total number of mating events as the sum of probabilities for all mating events with sampled fathers.
-Likewise, we estimated of the number of missing fathers is the sum of probabilities for all mating events for unsampled fathers.
-However, FAPS does not distinguish paternal families within groups of offspring of an unsampled father, so this value is a lower bound on the number of unsampled fathers.
+
+We previously noted that when FAPS errs, it tends to split one individual in a sibship into a singleton family, but essentially never incorrectly merges unrelated sibships \cite{ellis2018efficient}.
+We aimed to identify correct mating events based on family sizes.
+Previous investigations of FAPS showed that the main source of error was individuals from a larger sibship group being falsely assigned to a singleton sibship, although true half-siblings are almost never merged as full siblings (\cite{ellis2018efficient}).
+This predicts that those singleton families will have posterior-mean family sizes of less than one because the nominal number of offspring is one, but the posterior probability for the family is less than one.
+This idea is not necessarily intuitive, so to illustrate this, imagine three offspring (A, B and C) with two candidate fathers (X and Y) and that there are two plausible paternal-sibships configurations,: (1) X is the father of A, B and C, with probability 0.6, or (2) X is the father of A and B, while Y is the father of C with probability 0.4.
+The probability that X mated with the mother is 0.6+0.4=1, but the probability that Y mated with the mother is 0.4.
+Weighted mean offspring numbers are (3*0.6)+(2*0.4)=2.4 for X and 1*0.5=0.5 for Y.
+We can be more confident that the mother mated with X than with Y whilst being agnostic about the paternity of individuals.
+Based on this idea, we distinguish between mating events with posterior-mean family sizes greater or equal to one, and less than one.
 
 Finally, we estimated the relationship between the number of offspring in a maternal array and the number of paternal families therein.
 We first averaged paternal family size for each mother-father pair over iterations of the MCMC, then fitted a Poisson generalised linear model (GLM) of paternal family size on maternal family size (\cite{McCullagh1989}).
-
-% \subsubsection{Asymmetric dispersal}
-
-% To test for potential bias in the direction of pollen dispersal we calculated the mean difference in East-West position between mothers and fathers.
-% We compared the average asymmetry in direction for observed mating events to simulated mating events as described above.
-% Because all but one observed pollen donor turned out to be on the lower road we restricted this analysis to simulated pollen donors on the lower road.
 
 \subsection{Simulations}
 
@@ -297,62 +297,19 @@ To simulate missing fathers we randomly selected 10\%, 30\% and 50\% of true sir
 We simulated dispersal with mean distances of 3m, 30m and 300m.
 We repeated each parameter combination 100 times.
 
-We were interested in two measures of relationship inference.
-First, we used FAPS to calculate the accuracy of paternity of individuals, accounting for uncertainty in sibships \cite{ellis2018efficient}.
-We generated a table giving the most likely father of each offspring, which may be one of the genotyped candidate fathers or an unsampled 'missing' father, along with the posterior probability for that assignment, and compared this to the known list of fathers.
-We calculated the true positive rate as the probability that the the most-probable father is the correct father, among those offspring whose most likely father was not 'missing'.
-We calculated a false-negative rate as the probability that the most-probable father was assigned as 'missing' when he was in fact present, among those offspring whose most likely father was missing.
-False positive and false negative rates are given by one minus these values respectively.
-
-Second, we inferred plausible mating events accounting for uncertainty in sibship structure as described above.
-We previously noted that when FAPS errs, it tends to split one individual in a sibship into a singleton family, but essentially never incorrectly merges unrelated sibships \cite{ellis2018efficient}.
-These singleton families will tend to have posterior probabilities of less than one.
-This predicts that mating events with family sizes (weighted by posterior probability) less than one are likely to be spurious.
-To test this, we calculated the true-positive probability that mating events with weighted family sizes of one or more are correct.
-We also calculate the false-negative probability that weighted family sizes of less than one are correct.
-This analysis assesses the extent to which focussing on mating events with weighted family sizes  a convenient heuristic for identifying true mating events in empirical data.
-
-Finally, we investigated the contribution of different sources of information to genealogical inference.
-For each replicate dataset and parameter combination we calculated the accuracy of paternity and mating-event inference described above in three ways.
-We compared results obtained  (1) using only information from paternity (i.e. mother-father-offspring trios), (2) using information from paternity and sibling relationships (as described by \cite{ellis2018efficient}), and (3) using information from paternity, sibships and dispersal distances together (this paper).
-This analysis compares the contribution of information from paternity, sibling relationships and mating parameters to the paternity and mating event inference.
+We used simulated datasets to infer mating events using the same procedure as for the empirical dataset.
+We compared results based on mating events inferred using three sources of information.
+First, we used most likely mother-father-offspring trios inferred using Mendelian transition likelihoods ('paternity only').
+Second, we inferred mating events using information about both paternity and sibling relationships (as described by \cite{ellis2018efficient})
+Third, we combined information from paternity, sibling relationships and the shape and scale of the dispersal distribution together (this paper).
+To test the hypothesis that we can distinguish between reliable and dubious mating events based on family size we quantified the probability that an inferred mating event was correct separately for mating events with posterior-mean family sizes of one or more, or less than one.
+To investigate different datasets and analyses estimated real dispersal we compared true realised median dispersal distances in each simulated dataset to median dispersal from inferred mating events.
 
 \section{Results}
 
-% \subsection{True sibships can be identified with high confidence}
+\subsection{Family sizes vary in \textit{A.~majus}}
 
-% \begin{figure*}
-%     \centering
-%     \includegraphics{simulations.eps}
-%     \caption{
-%         Simulation results.
-%         Panels show the true proportion, $q$, of missing fathers; \textit{x}-axes show the assumed proportion used to infer families.
-%         (A) Number of paternal families identified with weighted-mean offspring number averaged over plausible sibships greater or less than one.
-%         (B) Probability that paternal families identified by FAPS are real.
-%         (C) Number of offspring inferred to have an unsampled father.
-%     }
-%     \label{fig:simulations}
-% \end{figure*}
-
-% We found that paternal families inferred from simulated data could be divided into those with family sizes of one or more, and a second group with weighted-mean family sizes less than one (figure \ref{fig:simulations}A).
-% Consistent with this, families with one or more offspring overwhelmingly reflect true mating events, whereas those with less than one offspring were overwhelmingly incorrect (figure \ref{fig:simulations}B).
-% This indicates that we can reliably identify true mating events by discarding paternal families with weighted-mean family sizes less than one.
-
-% We found surprisingly little effect of prior beliefs about the proportion of missing fathers on the accuracy of paternity inference.
-% Focussing on robust paternal families with one or more offspring, the number of families detected decreased as the true number of missing fathers increased, as one would expect (figure \ref{fig:simulations}A).
-% However, there was negligible relationship between the number of these families found and the prior expectation about the proportion of missing fathers, even when this prior substantially over- or under-estimated the true value.
-% We did find a slight increase in the probability that these inferred mating events were correct with higher input values of $q$ (figure \ref{fig:simulations}B), presumably because increasing the prior probability that a father is unsampled decreases the probability of paternity for candidates who are not true fathers.
-% Likewise, the number of offspring assigned to missing fathers increased with the true proportion of missing fathers, but there was no effect of changing the value of proportion of missing fathers used in the analysis (figure \ref{fig:simulations}C).
-% These results demonstrate that the prior expectations about the proportion of missing fathers has very little effect on downstream analyses.
-
-% We also note that the observed number of offspring with an unsampled father in the simulations is substantially higher than would be expected from the true proportion of fathers.
-% This is because the simulations use the true spatial distribution of maternal and candidate plants, and the same candidate can sire offspring with multiple mothers.
-% If that candidate is unsampled, this affects multiple full-sib families.
-% As such, assuming our simulation regime is sufficiently realistic, we should expect the proportion of offspring with an unsampled father in the empirical dataset to be higher than the true proportion of missing fathers.
-
-\subsection{Family sizes vary in *A.~majus*}
-
-We identified an average of 195 full-sibling families for which a father could be positively identified across MCMC samples (96\% credible intervals (CI): 189, 199).
+In the empirical \textit{A.~majus} dataset we identified an average of 195 full-sibling families for which a father could be positively identified across MCMC samples (96\% credible intervals (CI): 189, 199).
 6.5\% families had posterior probabilities and posterior-mean family sizes less than one, showed substantial uncertainty across MCMC iterations (figures S2) and seem to be drawn at random from across the population (figure S3), indicating that these mating events are likely to be dubious.
 In contrast, the remaining 168 families showed strong posterior support with little variation between MCMC iterations (figure S2), and were clustered closer to the maternal plants (figure S3).
 These likely reflect robust independent mating events that can be used to infer a dispersal kernel, and we focus on these mating events in the rest of this manuscript.
@@ -360,7 +317,7 @@ These likely reflect robust independent mating events that can be used to infer 
 Full-sibship sizes ranged from one to 18 (figure S4).
 The GLM of the number of full sibships on maternal-family size revealed that (natural) log number of sibships increased by 0.045 for every additional offspring included in the maternal family (intercept~=~0.40; figure S5). This corresponds to detecting a new family for approximately every 4 or 5 offspring genotyped, on average.
 
-For all sixty mothers we found a mating event with non-zero probability for which the father one or more offspring was not sampled (figure S2).
+For all sixty mothers we found evidence for paternity by one or more unsampled fathers with non-zero probability (figure S2).
 These families include an average of 789 offspring (CIs: 785, 793).
 This corresponds to around 60\% of the offspring.
 
@@ -381,8 +338,9 @@ This corresponds to around 60\% of the offspring.
     \includegraphics{fig-dispersal.eps}
     \caption{
         Distribution of pollen-dispersal distances.
-        (A) Histogram and (B) cumulative distribution of distances for dispersal events for paternal families with one or more offspring.
-        Note the log10 scale of the x-axis in B.
+        (A) Number of mating events in 30m bins.
+        (B) Cumulative distribution of distances for dispersal events for paternal families with one or more offspring.
+        Note the log$_{10}$ scale of the x-axis in B.
         Mating events are weight weighted by their posterior probability.
         The histogram is summed over iterations of the MCMC.
         Separate cumulative curves are shown for 1000 MCMC iterations separately.
@@ -397,44 +355,16 @@ Mean and median dispersal distances were 83.4 and 28.0 metres respectively.
 With two exceptions, all mating occurred between plants on the lower road (figure \ref{fig:map}).
 These results indicate a leptokurtic pollen dispersal kernel.
 
-% Pollen donors were on 26\% more likely to be to the East of the maternal plants they mated with than to the West.
-% The average position of observed pollen donors was 36.7 metres further to the East than their mates.
-% This indicates that there is a bias in pollen flow favouring Westward dispersal.
-
 \subsection{Mixture parameter strongly influences dispersal shape}
 
-The posterior distribtion the mixture parameter $\lambda$ was centred around 0.97 (96\% CIs: 0.89, 1.00; figure \ref{fig:posterior_summaries}C).
+The posterior distribution the mixture parameter $\lambda$ was centred around 0.97 (96\% CIs: 0.89, 1.00; figure \ref{fig:posterior_summaries}C).
 This indicates that up to 11\% of paternal families are compatible with non-sires located at medium to long distances from the mother.
-This may be because the true father is missing and/or stochastictity in Mendelian sampling of the genotypes.
+This may be because the true father is missing and/or stochasticity in Mendelian sampling of the genotypes.
 If ignored, this signal would inflate apparent leptokurtosis in the dataset.
-Consistent with this, when we constrain $\lambda$ to be fixed at one the posterior distributions for the scale and shape parameters are shifted downwards compared to the analysis where $\lambda$ is allowed to vary (posterior means for $a$ and $b$ drop from 22.0 to 15.0 and from 5.7 to 4.7 respectively; figure S8).
+Consistent with this, when we constrain $\lambda$ to be fixed at one the posterior distributions for the scale and shape parameters are shifted downwards compared to the analysis where $\lambda$ is allowed to vary (posterior means for $a$ and $b$ drop from 22.0 to 15.0 and from 5.7 to 4.7 respectively; figure S6).
 This would indicate more strongly leptokurtic pollen dispersal (figure \ref{fig:posterior_summaries}A, \ref{fig:posterior_summaries}B).
-When mean dispersal distance is estimated from the second moment of the generalised normal distribution (eqn. \ref{eqn:sd_GND}; \cite{clark1998trees}) this would imply a substantial increase in mean dispersal from 137 to 227 metres (figure S8).
+When mean dispersal distance is estimated from the second moment of the generalised normal distribution (eqn. \ref{eqn:sd_GND}; \cite{clark1998trees}) this would imply a substantial increase in mean dispersal from 137 to 227 metres (figure S7).
 In this instance then, including a mixture component in the dispersal kernel reduces apparent mean dispersal distance when this is inferred from the moments of the generalised-normal dispersal distribution.
-
-% \subsection{Dispersal information improves paternity inference}
-
-% \begin{figure*}
-%     \centering
-%     \includegraphics{fig-sim_paternity.eps}
-%     \caption{
-%         Paternity of individual offspring in simulated data.
-%         Values are shown for inference using paternity only, paternity and sibships, and paternity, sibships and dispersal information.
-%         (A) Probabilities that the most likely candidate is the true father among offspring assigned to a sampled father.
-%         (B) The proportion of offspring for which the most likely father was an unsampled father.
-%     }
-%     \label{fig:sim-paternity}
-% \end{figure*}
-
-% Simulated datasets showed that, as one would expect, the accuracy of paternity inference increased with more marker loci and with the proportion of true fathers that were sampled (figure \ref{fig:sim-paternity}A).
-% Conversely, there was almost no difference in accuracy with increasing full-sibship sizes.
-% We found a slight difference in accuracy between dispersal scenarios, with the least informative scenario (mean dispersal = 300m) showing the lowest accuracy, and more informative scenarios (mean dispersal = 30m or 3m) somewhat higher.
-% We also found a slight increase in accuracy from using paternity of individuals only to inferring the paternity of sibships, and a substantial increase in power when we used information about paternity, sibships and dispersal information together. 
-
-% We found similar patterns for the proportion of offspring whose most likely father was an unsampled father (figure \ref{fig:sim-paternity}B).
-% Interestingly, these values also increased with increasing number of markers, indicating that FAPS becomes more conservative about assigning paternity to sampled fathers as marker information increases.
-% We found that models using only paternity, or paternity and sibship information were substantially lower than the model including dispersal information, and tended to underestimate the true proportion of offspring whose father was missing when that proportion was high, but were largely correct when that proportion was low.
-% In contrast, the model that included dispersal information tended to overestimate the true proportion of offspring whose father was missing when that proportion was low, but were largely correct when that proportion was high.
 
 \subsection{Sibship and population information improve pedigree and dispersal inference}
 
@@ -444,13 +374,14 @@ In this instance then, including a mixture component in the dispersal kernel red
     \caption{
         Mating events in simulated data.
         Values show the probability that inferred mating events are correct for families with posterior-mean family sizes of (A) more or more or (B) less than one.
-        Values are shown for inference using paternity (Pat) only, paternity and sibships (sibs), and paternity, sibships and dispersal information.
+        Panels show the proportion of true fathers missing from the dataset used to infer mating events (columns) and the true full sibship size (rows).
+        Values are the mean of 100 replicate simulations, and are shown for inference using paternity (Pat) only, paternity and sibships (sibs), and paternity, sibships and dispersal information.
     }
-    \label{fig:sim-paternity}
+    \label{fig:sim-mating}
 \end{figure*}
 
 We used simulations to investigate how well we can distinguish true and false mating events based on posterior-mean family size.
-When families contained only a single offspring a large proportion of correct mating events had dubious support and posterior-mean family size less than one.
+When families contained only a single offspring a large proportion of correct mating events had dubious support and posterior-mean family size less than one (figure \ref{fig:sim-mating}A)..
 This was more pronounced with increased numbers of markers, and when dispersal information was included in the analysis.
 When real family sizes were greater than one however, almost no true mating events had posterior-mean family sizes less than one.
 Distinguishing true and false mating events based on family size gives mixed results for singleton families, but is an effective means to identify true mating events for larger families.
@@ -462,23 +393,42 @@ For example, when only paternity trios were used, the least informative scenario
 The clearest result is that there was a substantial gain in power to detect mating events when paternity and sibship information are used raelative to paternity only, and when paternity, sibship and dispersal information are used relative to paternity and sibships only.
 Including information from both sibships and population parameters greatly increase the accuracy of inferred mating events.
 
+A substantial proportion of simulated offspring were assigned to unsampled fathers (figure S8).
+Interestingly, this increased with increasing number of markers, indicating that FAPS becomes more conservative about assigning paternity to sampled fathers as marker information increases.
+We found that models using only paternity, or paternity and sibship information tended to underestimate the true proportion of offspring whose father was missing when that proportion was high, but were largely correct when that proportion was low.
+In contrast, the model that included dispersal information tended to overestimate the true proportion of offspring whose father was missing when that proportion was low, but were largely correct when that proportion was high.
+The improvement in identifying true mating events when including additional information may come with a cost of increased false-negative assignment to unsampeld fathers in some circumstances.
+
 \begin{figure*}
     \centering
-    \includegraphics{fig-sim_dispersal.eps}
+    \includegraphics{fig-sim_dipsersal.eps}
     \caption{
-        Mating events in simulated data.
-        Values show the probability that inferred mating events are correct for families with posterior-mean family sizes of (A) more or more or (B) less than one.
-        Values are shown for inference using paternity (Pat) only, paternity and sibships (sibs), and paternity, sibships and dispersal information.
+        Error in dispersal estimates in simulated data.
+        Values show the absolute difference in median dispersal events between real mating events and inferred mating events with posterior-mean family sizes of one or more.
+        Panels show the proportion of true fathers missing from the dataset used to infer mating events (columns) and the true full sibship size (rows).
+        Values are the mean of 100 replicate simulations, and are shown for inference using paternity (Pat) only, paternity and sibships (sibs), and paternity, sibships and dispersal information.
     }
-    \label{fig:sim-paternity}
+    \label{fig:sim-dispersal}
 \end{figure*}
 
+We compared median dispersal of inferred mating events to true median dispersal.
+Dispersal estimates were substantially more accurate when more markers were used, but showed less of a dependence on family size or the proportion of sampled fathers.
+Instead, estimated dispersal distances depended strongly on true dispersal distance; estimates were most accurate for datasets with the shortest dispersal and lest accurate for dispersal over the largest distance.
+Estimated dispersal also depended strongly on the information used to infer mating events.
+Analyses using paternity information only often overestimated dispersal by more than a hundred metres.
+Including information about sibling relationships reduced this estimate substantially, and including information about dispersal reduced these even further.
+Of particular note is that when all 67 markers are used, as in our empirical dataset, the estimate of median dispersal is typically within one metre of the true value, indicating that our empirical estimate is robust.
+Inference of dispersal distance is most reliable when dispersal is over relatively short scales, and as much information as possible is included in the analysis.
 
 \section{Discussion}
 
 We have described a framework to jointly infer paternity, sibling relationships and population parameters. 
-Applying this to a natural populations of snapdragons, we find strong evidence for a leptokurtic pollen-dispersal distribution, as well as evidence for asymmetry in pollen dispersal from East to West.
-Below we discuss possible influence of incorrect genealogies on the results, the implications for the hybrid zone population, as well as the limitations and possible future directions of the method.
+Applying this to a natural populations of snapdragons, we find strong evidence for a leptokurtic pollen-dispersal distribution.
+Using simulations we demonstrate that sibship and population information improves inference of genealogical relationships and biological conclusions.
+
+\subsection{Implications for the hybrid-zone population}
+
+The shape of the dispersal kernel implies that most mating occurs within tens of metres, but that there is a long tail of mating events between individuals at up to several hundred metres. This result suggests that any natural selection acting through male reproductive components (pollen dispersal) occurs at small spatial scales. If pollinators discriminate between different flower-colour phenotypes in the hybrid zone, this sets an important geographic scale of selection for empirical tests on pollinator-mediated selection. For example, within 20m in the core of the hybrid zone, pollinators would encounter a full range of colour phenotypes that would provide scope for colour discrimination and differential visitation to influence male and female fitness. In this paper we have not attempted to estimate selection via flower colour because the number of mothers for each flower colour is small, meaning that we likely have little statistical power. However, in ongoing work we are investigating variation in fitness in a much larger panel of offspring arrays, which will allow us to address such questions with much greater accuracy.
 
 \subsection{Controlling bias in dispersal estimates}
 
@@ -491,17 +441,19 @@ Two aspects of our study suggest that signal from false fathers should have a mi
 First, our simulations showed that incorrect families could be readily identified based on family size.
 In previous simulations to test the performance of FAPS we found that the main source of error was individuals from a larger sibship group being falsely assigned to a singleton sibship, but this analysis focussed on the most likely partition structure to simplify results (\cite{ellis2018efficient}).
 In this study we found that those incorrect singleton families have only weak posterior probabilities when we consider a whole set of plausible sibship configurations, meaning that family sizes are effectively less than one individual.
-This idea is not necessarily intuitive, so to illustrate this, imagine three offspring (A, B and C) with two candidate fathers (X and Y) and that there are two plausible paternal-sibships configurations,: (1) X is the father of A, B and C, with probability 0.6, or (2) X is the father of A and B, while Y is the father of C with probability 0.4.
-The probability that X mated with the mother is 0.6+0.4=1, but the probability that Y mated with the mother is 0.4.
-Weighted mean offspring numbers are (3*0.6)+(2*0.4)=2.4 for X and 1*0.5=0.5 for Y.
-Since our goal was to infer pollen dispersal by identifying mate pairs, excluding mating events for families with sizes less than one is an effective way to control false-paternity assignment.
+Since our goal was to infer pollen dispersal by identifying mate pairs, excluding mating events for families with sizes less than one is an effective way to identify a conservative set of high-confidence mating events, even if this means that some true mating events are lost.
+Consistent with this, in simulated data that closely match the \textit{A.~majus} dataset we found that estimated dispersal was very close to the true values, indicating that false-positive mating events have not had a large influence on our estimates of dispersal.
 This demonstrates that accounting for uncertainty in sibship structure is an extremely useful way to improve the accuracy of paternity inference.
 
 Second, we modelled dispersal as a mixture distribution with a term allowing for false-positive fathers to try and reduce the bias in estimates of dispersal.
 The mixture distribution reduces the bias in the estimated shape parameter and the second moment of the generalised normal distribution, often interpreted as mean (squared) dispersal distance (e.g. \cite{clark1998trees, austerlitz2004using, klein2008pollen}).
 We note that this bias will exist to some extent as long as knowledge of paternity is less than perfect.
-As such the mixture model reduces this bias, but is unlikely to completely eliminate it completely.
-Our biological conclusions are not affected, because we focus on the distribution of realised mating events, which are affected in only a minor way in real terms (figure \ref{fig:dispersal}C, \ref{fig:dispersal}D).
+Moreover, two factors may complicate the interpretation of the mixture paramter.
+First, the idea assumes that unrelated pollen donors are distributed at random with respect to genotypes, which will not be the case if there is spatial genetic structure.
+In the case of the \textit{A.~majus} populaton the marker panel was designed to show very little spatial structure, so this is unlikely to have a substantial impact.
+Second, more distant mating events may be real, but reflect some other distribution process than that modelled by the generalised normal distribution.
+In this case, the mixture component is still useful in that it allows these two distributions to be decoupled, at least to some extent.
+Here, our biological conclusions are not affected, because we focus on the distribution of realised mating events, which are affected in only a minor way in real terms (figure \ref{fig:dispersal}).
 However, caution is warranted in the interpretation of the raw parameter values for shape and mean dispersal from the generalised normal distribution (figure S8).
 It is possible that the effect was stronger here than would be the case in other published studies because our sample of candidate fathers is large, and the spatial extend is much larger (two orders of magnitude) than median dispersal distance.
 In contrast, other studies have focussed on wind-pollinated trees, where pollen can travel much further, and had smaller numbers of candidates (e.g. \cite{adams1992using, austerlitz2004using, klein2008pollen}).
@@ -510,9 +462,11 @@ This demonstrates the utility of using inferred dispersal parameters to inform i
 \subsubsection{Missing fathers}
 
 An alternative source of bias comes from false negative paternity, where the true father of a family is present but is inferred to be missing.
-We found that more than half the offspring were inferred to have an unsampled father, and that this did not strongly depend on prior beliefs about the proportion of missing fathers.
-Whether these missing fathers bias dispersal estimates depends on whether they are likely to be randomly distributed in space.
-On one hand, it may be that sampling effort was greater in the core of the hybrid zone than at the edges of our sampling region, and it is known that bumblebees, especially queens, can disperse over several kilometres (\cite{osborne2008bumblebee, hagen2011space, lepais2010estimation}).
+We found that more than half the offspring were inferred to have an unsampled father.
+Since these are cases were paternity has not been falsely assigned to an unrelated candidate, we do not expect false assignment to bias dispersal estimates upwards.
+Nevertheless, the extent to which these missing fathers bias dispersal estimates still depends on their distribution in space.
+At the same time, it may be that sampling effort was greater in the core of the hybrid zone than at the edges of our sampling region.
+It is known that bumblebees, especially queens, can disperse over several kilometres, so very long range pollen dispersal is plausible (\cite{osborne2008bumblebee, hagen2011space, lepais2010estimation}).
 In this way it is possible that we have missed long-distance mating events, which would bias dispersal estimates downward.
 However, our sample of candidate fathers is large, and extends at least a kilometer beyond the range of plants identified as pollen donors (figure \ref{fig:map}), which is more than twice as far as the longest dispersal event detected (figure \ref{fig:dispersal}).
 We feel it is thus unlikely that there could have been enough unsampled fathers far from the sample of mothers to greatly influence dispersal shape or median dispersal distance.
@@ -522,38 +476,38 @@ This is a more plausible explanation, because the population had already begun t
 July.
 The majority of unsampled fathers may thus represent relatively early-flowering individuals.
 Fortunately, it seems that flowering time is unlikely to depend strongly on location, and as such this is unlikely to bias dispersal estimates.
-Ongoing work using many more samples of mothers across both space and time will allow us to address questions such as this.
 
-\subsection{Implications for the hybrid-zone population}
+\subsection{The value of sibship and population data}
 
-The shape of the dispersal kernel implies that most mating occurs within tens of metres, but that there is a long tail of mating events between individuals at up to several hundred metres. This result suggests that any natural selection acting through male reproductive components (pollen dispersal) occurs at small spatial scales. If pollinators discriminate between different flower-colour phenotypes in the hybrid zone, this sets an important geographic scale of selection for empirical tests on pollinator-mediated selection. For example, within 20m in the core of the hybrid zone, pollinators would encounter a full range of colour phenotypes that would provide scope for colour discrimination and differential visitation to influence male and female fitness. In this paper we have not attempted to estimate selection via flower colour because the number of mothers for each flower colour is small, meaning that we likely have little statistical power. However, in ongoing work we are investigating variation in fitness in a much larger panel of offspring arrays, which will allow us to address such questions with much greater accuracy.
+We found that information about sibling relationships and information about dispersal improved identification of mating events in simulated data.
+In a similar study, \cite{walling2010comparing} compared parentage assignment in a wild deer population inferred from the programs Cervus (which uses parent-offspring trios; \cite{marshall1998statistical}), Colony (which infers parentage and sibling relationships; \cite{wang2009parentage}) and MasterBayes (which infers parentage and population parameters; \cite{hadfield2006towards}).
+Both Colony and MasterBayes showed a similar increase in paternity assignment when sibship and population data were included over analyses using the same programs that only used parentage information, but were not able to combine the sources of information.
+Here we include both sibship and population information into a single analysis and find that they are useful independent of one another.
 
-We found evidence that all but one mating event was between plants on the lower road, and that pollen donors on this road tended to be to the East of maternal plants.
-This indicates that pollen tends to move Westward from where the magenta \textit{A. m. pseudomajus} dominates towards where yellow \textit{A. m. striatum} is more common, implying an asymmetry of introgression from \textit{A. m. pseudomajus} into \textit{A. m. striatum}.
-We note however that our sample of maternal plants was restricted to a relatively narrow region around the core of the hybrid zone, to only one of the two roads where \textit{A. majus} is common (figure \ref{fig:map}), and in only a single year.
-As such, the finding of asymmetric introgression should be regarded as preliminary.
-In ongoing work we are investigating the detailed shape of clines across the genome in the population that reflect demographic processes over longer time scales, and should be able to shed clearer light on this phenomenon.
+There was surprisingly little difference in the accuracy of mating events with increasing family sizes in simulated data (figure \ref{fig:sim-mating}B).
+This is counter to expectations by \cite{wang2007parentage} that power should increase with more siblings.
+This may be partly due to the structure of the simulations.
+We kept the number of mating events fixed, so increasing family size means increasing the total number of progeny.
+That in turn means that there are more opportunities for an offspring to be incorrectly assigned to an unrelated father.
+In addition, FAPS estimates likelihoods of full sibships by multiplying probabilities of paternity for individuals, which under-utilises the available information about parentage shared between siblings \citep{thompson1987parental}.
+As such, it is possible that we have underestimated the value of sibling relationships in this study.
 
-\subsection{Limitations and future directions}
+It is helpful to view population data as acting like a Bayesian prior that places different weights on paternity probabilities independent of genotype data (eqn \ref{eqn:probability_model}).
+In the case of dispersal, an expectation that dispersal occurs over shorter distances favours candidates close to the mother, which effectively narrows the pool of plausible candidates, and limits the number of unrelated candidates who could incorrectly assigned as a father.
+This explains the observation that including dispersal information decreased the number of incorrect mating events and increased the proportion of offspring assigned to missing fathers (figures \ref{fig:sim-mating}B, S8).
+It also explains why estimated median dispersal distances were more accurate for narrower dispersal distances (figure \ref{fig:sim-dispersal}).
+Our simulations did not investigate the effect of how badly one can misspecify the shape of the dispersal kernel before results are untenable, which would be a useful future avenue.
 
-In this study we used Metropolis-Hastings MCMC to update population parameters, and re-evaluate sibship structures at each iteration using the Monte-Carlo simulations described by \textcite{ellis2018efficient}.
-This has two obvious computational limitations that could be improved upon.
-First, the Metropolis-Hastings algorithm known to explore parameter space inefficiently as models become complex.
-However, more efficient MCMC samplers, such as Hamiltonian Monte Carlo are challenging to implement, especially when the likelihood component needs to be estimated by simulation (\cite{betancourt2017conceptual}).
-Second, the Monte-Carlo simulations take several seconds to run, which means chains with many iterations take a long time.
-
-These issues could be greatly simplified by avoiding repeated Monte-Carlo simulations at each iteration.
-One way to achieve this would be to first identify full-sibling families with strong support based on genetic data \cite{ellis2018efficient}).
-Our simulations showed that this can be done with high confidence based on family size.
-Then, these families could be used to jointly infer paternity and population parameters following eqn. \ref{eqn:lik_if_no_structure}.
-In this case the likelihood is the sum of elements in a matrix, which is very cheap to compute.
-This would allow for much more flexibility in how to optimise parameter estimation.
-This is turn would allow users to focus less on implementation and more on modelling biological problems.
-
+In this paper we have outlined a general method to combine data about population parameters with analyses of paternity and sibship.
+We have modelled dispersal distances this as one such factor affecting mating probabilities to illustrate this, but this clearly underestimates the complexity of interesting mating patterns that could be modelled.
+For example, we would expect that a pollen donor's overall floral display size, which may be viewed as a proxy for fecundity, as well as the extent to which flowering phenologies overlap to be positively correlated with the probability of mating with a maternal plant.
+Likewise, flower colour may well also play a role in mating, although it is less clear exactly how.
+Although it would be feasible to include such data to inform pedigree analyses (see Methods), we have not attempted this here because we currently lack the data to do this in a meaningful way.
+Ongoing work currently aims to collect much more detailed demographic and phenotypic information from many more plants, which will allow us to explore these ideas further.
 
 \section{Acknowledgements}
 
-We thank a large number of field volunteers for maintaining the population sampling, and Tom White for assistance with seed collection. We thank Sylvia Rebel for plating tissue for DNA extraction and Sean Stankowski for feedback on the manuscript.
+We thank a large number of field volunteers for maintaining the population sampling, and Tom White for assistance with seed collection. We thank Sylvia Rebel for plating tissue for DNA extraction, as well as Sean Stankowski and two anonymous reviewers for feedback on the manuscript.
 
 \section{Data availability}
 
