@@ -412,31 +412,67 @@ This would indicate more strongly leptokurtic pollen dispersal (figure \ref{fig:
 When mean dispersal distance is estimated from the second moment of the generalised normal distribution (eqn. \ref{eqn:sd_GND}; \cite{clark1998trees}) this would imply a substantial increase in mean dispersal from 137 to 227 metres (figure S8).
 In this instance then, including a mixture component in the dispersal kernel reduces apparent mean dispersal distance when this is inferred from the moments of the generalised-normal dispersal distribution.
 
-\subsection{Dispersal information improves paternity inference}
+% \subsection{Dispersal information improves paternity inference}
+
+% \begin{figure*}
+%     \centering
+%     \includegraphics{fig-sim_paternity.eps}
+%     \caption{
+%         Paternity of individual offspring in simulated data.
+%         Values are shown for inference using paternity only, paternity and sibships, and paternity, sibships and dispersal information.
+%         (A) Probabilities that the most likely candidate is the true father among offspring assigned to a sampled father.
+%         (B) The proportion of offspring for which the most likely father was an unsampled father.
+%     }
+%     \label{fig:sim-paternity}
+% \end{figure*}
+
+% Simulated datasets showed that, as one would expect, the accuracy of paternity inference increased with more marker loci and with the proportion of true fathers that were sampled (figure \ref{fig:sim-paternity}A).
+% Conversely, there was almost no difference in accuracy with increasing full-sibship sizes.
+% We found a slight difference in accuracy between dispersal scenarios, with the least informative scenario (mean dispersal = 300m) showing the lowest accuracy, and more informative scenarios (mean dispersal = 30m or 3m) somewhat higher.
+% We also found a slight increase in accuracy from using paternity of individuals only to inferring the paternity of sibships, and a substantial increase in power when we used information about paternity, sibships and dispersal information together. 
+
+% We found similar patterns for the proportion of offspring whose most likely father was an unsampled father (figure \ref{fig:sim-paternity}B).
+% Interestingly, these values also increased with increasing number of markers, indicating that FAPS becomes more conservative about assigning paternity to sampled fathers as marker information increases.
+% We found that models using only paternity, or paternity and sibship information were substantially lower than the model including dispersal information, and tended to underestimate the true proportion of offspring whose father was missing when that proportion was high, but were largely correct when that proportion was low.
+% In contrast, the model that included dispersal information tended to overestimate the true proportion of offspring whose father was missing when that proportion was low, but were largely correct when that proportion was high.
+
+\subsection{Sibship and population information improve pedigree and dispersal inference}
 
 \begin{figure*}
     \centering
-    \includegraphics{fig-sim_paternity.eps}
+    \includegraphics{fig-sim_mating.eps}
     \caption{
-        Paternity of individual offspring in simulated data.
-        Values are shown for inference using paternity only, paternity and sibships, and paternity, sibships and dispersal information.
-        (A) Probabilities that the most likely candidate is the true father among offspring assigned to a sampled father.
-        (B) The proportion of offspring for which the most likely father was an unsampled father.
+        Mating events in simulated data.
+        Values show the probability that inferred mating events are correct for families with posterior-mean family sizes of (A) more or more or (B) less than one.
+        Values are shown for inference using paternity (Pat) only, paternity and sibships (sibs), and paternity, sibships and dispersal information.
     }
     \label{fig:sim-paternity}
 \end{figure*}
 
-Simulated datasets showed that, as one would expect, the accuracy of paternity inference increased with more marker loci and with the proportion of true fathers that were sampled (figure \ref{fig:sim-paternity}A).
-Conversely, there was almost no difference in accuracy with increasing full-sibship sizes.
-We found a slight difference in accuracy between dispersal scenarios, with the least informative scenario (mean dispersal = 300m) showing the lowest accuracy, and more informative scenarios (mean dispersal = 30m or 3m) somewhat higher.
-We also found a slight increase in accuracy from using paternity of individuals only to inferring the paternity of sibships, and a substantial increase in power when we used information about paternity, sibships and dispersal information together. 
+We used simulations to investigate how well we can distinguish true and false mating events based on posterior-mean family size.
+When families contained only a single offspring a large proportion of correct mating events had dubious support and posterior-mean family size less than one.
+This was more pronounced with increased numbers of markers, and when dispersal information was included in the analysis.
+When real family sizes were greater than one however, almost no true mating events had posterior-mean family sizes less than one.
+Distinguishing true and false mating events based on family size gives mixed results for singleton families, but is an effective means to identify true mating events for larger families.
 
-We found similar patterns for the proportion of offspring whose most likely father was an unsampled father (figure \ref{fig:sim-paternity}B).
-Interestingly, these values also increased with increasing number of markers, indicating that FAPS becomes more conservative about assigning paternity to sampled fathers as marker information increases.
-We found that models using only paternity, or paternity and sibship information were substantially lower than the model including dispersal information, and tended to underestimate the true proportion of offspring whose father was missing when that proportion was high, but were largely correct when that proportion was low.
-In contrast, the model that included dispersal information tended to overestimate the true proportion of offspring whose father was missing when that proportion was low, but were largely correct when that proportion was high.
+The simulations also reveal how well we can reconstruct mating events under different scenarios and using different data.
+Inferred mating events were more likely to be correct as the number of marker loci and the proportion of true fathers that were sampled increased, and decreased with larger families (figure \ref{fig:sim-mating}B).
+We found small differences in accuracy between dispersal scenarios, but the direction depended on what information was used to infer mating events.
+For example, when only paternity trios were used, the least informative scenario (mean dispersal = 300m) showed the highest accuracy, and the most informative (mean dispersal = 3m) the lowest, but when information from paternity and sibships were combined the opposite pattern was true.
+The clearest result is that there was a substantial gain in power to detect mating events when paternity and sibship information are used raelative to paternity only, and when paternity, sibship and dispersal information are used relative to paternity and sibships only.
+Including information from both sibships and population parameters greatly increase the accuracy of inferred mating events.
 
-\subsection{}
+\begin{figure*}
+    \centering
+    \includegraphics{fig-sim_dispersal.eps}
+    \caption{
+        Mating events in simulated data.
+        Values show the probability that inferred mating events are correct for families with posterior-mean family sizes of (A) more or more or (B) less than one.
+        Values are shown for inference using paternity (Pat) only, paternity and sibships (sibs), and paternity, sibships and dispersal information.
+    }
+    \label{fig:sim-paternity}
+\end{figure*}
+
 
 \section{Discussion}
 
