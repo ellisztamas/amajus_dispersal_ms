@@ -355,13 +355,13 @@ Mean and median dispersal distances were 83.4 and 28.0 metres respectively.
 With two exceptions, all mating occurred between plants on the lower road (figure \ref{fig:map}).
 These results indicate a leptokurtic pollen dispersal kernel.
 
-\subsection{Mixture parameter strongly influences dispersal shape}
+\subsection{Mixture parameter influences dispersal shape}
 
 The posterior distribution the mixture parameter $\lambda$ was centred around 0.97 (96\% CIs: 0.89, 1.00; figure \ref{fig:posterior_summaries}C).
 This indicates that up to 11\% of paternal families are compatible with non-sires located at medium to long distances from the mother.
 This may be because the true father is missing and/or stochasticity in Mendelian sampling of the genotypes.
 If ignored, this signal would inflate apparent leptokurtosis in the dataset.
-Consistent with this, when we constrain $\lambda$ to be fixed at one the posterior distributions for the scale and shape parameters are shifted downwards compared to the analysis where $\lambda$ is allowed to vary (posterior means for $a$ and $b$ drop from 22.0 to 15.0 and from 5.7 to 4.7 respectively; figure S6).
+Consistent with this, when we constrain $\lambda$ to be fixed at 1 the posterior distributions for the scale and shape parameters are shifted downwards compared to the analysis where $\lambda$ is allowed to vary (posterior means for $a$ and $b$ drop from 22.0 to 15.0 and from 5.7 to 4.7 respectively; figure S6).
 This would indicate more strongly leptokurtic pollen dispersal (figure \ref{fig:posterior_summaries}A, \ref{fig:posterior_summaries}B).
 When mean dispersal distance is estimated from the second moment of the generalised normal distribution (eqn. \ref{eqn:sd_GND}; \cite{clark1998trees}) this would imply a substantial increase in mean dispersal from 137 to 227 metres (figure S7).
 In this instance then, including a mixture component in the dispersal kernel reduces apparent mean dispersal distance when this is inferred from the moments of the generalised-normal dispersal distribution.
@@ -376,14 +376,16 @@ In this instance then, including a mixture component in the dispersal kernel red
         Values show the probability that inferred mating events are correct for families with posterior-mean family sizes of (A) more or more or (B) less than one.
         Panels show the proportion of true fathers missing from the dataset used to infer mating events (columns) and the true full sibship size (rows).
         Values are the mean of 100 replicate simulations, and are shown for inference using paternity (Pat) only, paternity and sibships (sibs), and paternity, sibships and dispersal information.
+        Note that values for inference with paternity only are not shown in A because these genealogies are inferred from the most-likely configuration, so a posterior-mean family size is not defined.
     }
     \label{fig:sim-mating}
 \end{figure*}
 
 We used simulations to investigate how well we can distinguish true and false mating events based on posterior-mean family size.
-When families contained only a single offspring a large proportion of correct mating events had dubious support and posterior-mean family size less than one (figure \ref{fig:sim-mating}A)..
+When families contained only a single offspring a large proportion of correct mating events had dubious support and posterior-mean family size less than one (figure \ref{fig:sim-mating}A).
 This was more pronounced with increased numbers of markers, and when dispersal information was included in the analysis.
 When real family sizes were greater than one however, almost no true mating events had posterior-mean family sizes less than one.
+This means that when families contain multiple siblings there is no cost to ignoring apparent singleton families.
 Distinguishing true and false mating events based on family size gives mixed results for singleton families, but is an effective means to identify true mating events for larger families.
 
 The simulations also reveal how well we can reconstruct mating events under different scenarios and using different data.
