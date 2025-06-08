@@ -35,7 +35,7 @@ np.random.seed(87)
 priors = (lambda x : {
     'missing' : beta.pdf(x['missing'], a=3,   b=15),
     'mixture' : beta.pdf(x['mixture'], a=1.1, b=1.1),
-    'shape'   : lognorm.pdf(x['shape'],  scale=-0.7,  s = 0.5),
+    'shape'   : lognorm.pdf(x['shape'], scale = 0.5, s=0.5),
     'scale'   : gamma.pdf( x['scale'], a=2,   scale = 100)
 })
 
