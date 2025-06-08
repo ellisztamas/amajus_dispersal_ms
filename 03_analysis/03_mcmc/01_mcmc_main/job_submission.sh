@@ -2,11 +2,11 @@
 
 # SLURM
 #SBATCH --job-name=mcmc_main
-#SBATCH --mem=4GB
+#SBATCH --mem=1GB
 #SBATCH --output=slurm/%x-%a.out
 #SBATCH --error=slurm/%x-%a.err
 #SBATCH --qos=medium
-#SBATCH --time=1-00:00:00
+#SBATCH --time=2-00:00:00
 #SBATCH --array=1-4
 
 # ENVIRONMENT #

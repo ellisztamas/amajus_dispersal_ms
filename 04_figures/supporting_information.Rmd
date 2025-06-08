@@ -47,7 +47,7 @@ mcmc_results <- list.dirs("03_analysis/03_mcmc", recursive = FALSE) %>%
 
 # Import data table listing mating events
 me = read_csv(
-  "03_analysis/04_mating_events/output/01_mcmc_main/mating_events_over_chains.csv",
+  "03_analysis/04_mating_events/output/mating_events_over_chains.csv",
   col_types = 'iccdddddd') %>% 
   left_join( 
     read_csv("01_data/maternal_family_sizes.csv", col_types = 'ci'), by = "mother"
@@ -64,8 +64,8 @@ nsims <- 1000 # number of replicate simulations to run
 # Mild skepticism about priors
 # Define hyperpriors
 prior_values <- list(
-  scale = rgamma(shape=6, scale = 50, n = nsims),
-  shape = exp(rnorm(mean = 0, sd=0.5, n = nsims)),
+  scale = rgamma(shape=2, scale = 100, n = nsims),
+  shape = exp(rnorm(mean = -0.7, sd=0.7, n = nsims)),
   sim   = NULL
 )
 
@@ -79,7 +79,7 @@ prior_values$sim  <- prior_sim(
 
 ```
 
-```{r plot-prior-sims, fig.cap="Prior simulations. Histrograms show simulated values for the scale (A-C) and shape (D-F) parameters of the generalised normal distribution, with  and the dispersal distances those imply (G-I). Simulations are shown for three prior contrasting dispersal scenarios: (A,D,G) a model with moderate skepticism about leptokurtotic dispersal;  (B,E, H) a model allowing leptokurtosis, but skeptical of long-range dispersal; (C,F, I) a model highly skeptical of leptokurtosis. In A-F, Gamma priors on the shape and scale of the GND are giving, showing the shape and rate of the Gamma distribution. D-F also indicate the proportion of the prior mass on leptokurtotic distributions (when b<1). Each histogram is summed over 1000 replicate draws from Gamma priors."}
+```{r plot-prior-sims, fig.cap="Prior simulations. Histrograms show simulated values for the scale and shape parameters of the generalised normal distribution, and the dispersal distances those imply. Each histogram is summed over 1000 replicate draws from Gamma priors."}
 
 par(mfrow=c(1,3) )#, mar = c(4,4,1, 0))
 
@@ -108,8 +108,6 @@ hist(prior_values$sim$draws,
 ```{r prob-family-sizes, fig.cap="Posterior probabilities and sizes of paternal families. Each point shows the mean probability of a mating event between a mother and a single father averaged over 1000 MCMC iterations for the 'restricted-kurtosis' prior scenario, with 96% credible intervals. Colour indicates whether the father was in the sample of candidate or was unsampled. Note that individuals in families with unsampled fathers may consist of multiple paternal families."}
 
 n_iter <- length(unique(me$iter))
-
-# p2 <-
 
 me %>% 
   # Keep only mating events with a sampled father
@@ -144,6 +142,24 @@ me %>%
 # 
 
 ```
+
+```{r distance-vs-prob, fig.cap="Relationship between the distance between mothers and inferred fathers and the posterior probability of the mating event. Points are coloured separately to indicate whether family sizes are less or greater than one.", warning=FALSE}
+me %>% 
+  group_by(mother, father, distance) %>% 
+  summarise(
+    prob = mean(prob),
+    offspring = mean(offspring)
+  ) %>% 
+  mutate(`Family size` = ifelse(offspring >=1, "One or more", "Less than one")) %>% 
+  ggplot(aes(x=distance, y = prob, colour=`Family size`)) +
+  geom_point() +
+  labs(
+    x = "Inter-mate distance",
+    y = "Posterior probability"
+  ) + 
+  theme_bw()
+```
+
 
 ```{r family-sizes, fig.cap="Histogram of paternal family sizes weighted by posterior probability of each family. Data are shown for families with an identifiable father, and those inferred to be sired by an unsampled father. Colours indicate whether weighted-mean family size was more or less than one."}
 me %>% 
@@ -209,7 +225,7 @@ mean_me %>%
 
 ```
 
-```{r caterpillar-plots, fig.cap="Change in log posterior density over four independent MCMC chains. The first 500 iterations of each chain have been removed as burn-in.", fig.width=22/2.54}
+```{r caterpillar-plots, fig.cap="Change in log posterior density over four independent MCMC chains. The first 500 iterations of each chain have been removed as burn-in.", fig.width=22/2.54, include=TRUE}
 
 # Plot the change in log posterior through time
 mcmc_results %>%
@@ -261,24 +277,6 @@ ggarrange(
 
 ```
 
-```{r distance-vs-prob, fig.cap="Relationship between the distance between mothers and inferred fathers and the posterior probability of the mating event. Points are coloured separately to indicate whether family sizes are less or greater than one.", warning=FALSE}
-me %>% 
-  group_by(mother, father, distance) %>% 
-  summarise(
-    prob = mean(prob),
-    offspring = mean(offspring)
-  ) %>% 
-  mutate(`Family size` = ifelse(offspring >=1, "One or more", "Less than one")) %>% 
-  ggplot(aes(x=distance, y = prob, colour=`Family size`)) +
-  geom_point() +
-  labs(
-    x = "Inter-mate distance",
-    y = "Posterior probability"
-  ) + 
-  theme_bw()
-```
-
-
 ```{r sd-gnd, fig.cap="Mean dispersal distances implied by the second moment of the generalised normal distribution based on scale and shape parameters from MCMC chains for six prior scenarios."}
 
 # Function to calculate the mean dispersal distance as the 2nd moment of the 
@@ -323,10 +321,48 @@ mcmc_results %>%
     theme(
       axis.text.x = element_text(angle = 90, hjust = 1, size = 8)
     )
+```
 
-  
+```{r, fig.height=20/2.54, fig.width=16.9/2.54, fig.cap="Proportion of offspring assigned to missing fathers in simulated data. Panels show the proportion of true fathers missing from the dataset used to infer mating events (columns) and the true full sibship size (rows). Values are the mean of 100 replicate simulations, and are shown for inference using paternity (Pat) only, paternity and sibships (sibs), and paternity, sibships and dispersal information."}
 
+sim_mating_events <- read_csv(
+  "03_analysis/05_simulations/output/sims_mating.csv",
+  col_types = 'ffidifddddddddd'
+  )
 
+sim_mating_events <- sim_mating_events %>% 
+  group_by(scale, nloci, prop_purged, family_size, data_type) %>% 
+  summarise(
+    true_pos  = mean(true_if_offs_ge1, na.rm = TRUE),
+    false_neg = mean(true_if_offs_lt1, na.rm = TRUE),
+    missing = mean(missing, na.rm = TRUE)
+  ) %>% 
+  # Rejig the variables to make them plot nicely.
+  mutate(
+    scale = paste0(scale, "m"),
+    prop_purged = paste0(prop_purged*100, "% missing fathers"),
+    family_size = paste0(family_size, " siblings"),
+    data_type = case_when(
+      data_type == "paternity" ~ "Paternity only",
+      data_type == "sibships" ~ "Pat., sibships",
+      data_type == "full" ~ "Pat., sibs., dispersal"
+    )
+  ) %>% 
+  rename(
+    `Mean dispersal` = scale,
+    Inference = data_type
+  )
 
+# plot_ge1 <- 
+sim_mating_events %>% 
+  ggplot(aes(x=nloci, y=missing, colour=Inference, linetype=`Mean dispersal`)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    x = "Number of markers",
+    y = "Proportion assigned missing"
+  ) +
+  theme_bw() +
+  facet_grid(family_size~prop_purged)
 ```
 

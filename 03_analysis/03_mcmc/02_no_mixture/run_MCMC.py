@@ -24,8 +24,8 @@ args = parser.parse_args()
 exec(open('03_analysis/01_data_formatting/setup_FAPS_GPS.py').read())
 
 # INITIALISE THE MODEL
-nreps = 3000 # Total number of iterations to run
-thin  = 10 # How often to write samples.
+nreps = 25500 # Total number of iterations to run
+thin  = 100 # How often to write samples.
 max_distance = np.inf # set a maximum dispersal distance
 output_dir = os.path.dirname(os.path.abspath(__file__))+'/output/'
 os.makedirs(output_dir, exist_ok=True)
@@ -36,8 +36,8 @@ np.random.seed(87)
 priors = (lambda x : {
     'missing' : beta.pdf(x['missing'], a=3,   b=15),
     'mixture' : 1,
-    'shape'   : lognorm.pdf(x['shape'],  scale=1,  s = 0.5),
-    'scale'   : gamma.pdf( x['scale'], a=6,   scale = 50)
+    'shape'   : lognorm.pdf(x['shape'],  scale=-0.7,  s = 0.5),
+    'scale'   : gamma.pdf( x['scale'], a=2,   scale = 100)
 })
 
 # Proposed values are a Gaussian peturbation away from the previous values.
