@@ -6,13 +6,9 @@ There are also wrapper functions to simplify passing to internal FAPS objects.
 """
 
 import numpy as np
-import pandas as pd
 import faps as fp
-from time import time, strftime
-from tqdm import tqdm
 
 from amajusmating import dispersal
-from amajusmating import mcmc
 
 class faps_data(object):
     def __init__(self, paternity, gps, flower_colours, params):
