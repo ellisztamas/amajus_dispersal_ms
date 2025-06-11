@@ -165,7 +165,8 @@ FAPS begins with marker data for one or more maternal families composed of a mix
 FAPS uses marker data \textbf{M} to build matrix \textbf{G} of probabilities of paternity based on Mendelian transition probabilities for each maternal family.
 \textbf{G} has a row for each offspring and a column for each candidate father, where element $g_{ij}$ is the probability that candidate \textit{j} is the father of offspring \textit{i} given marker data, and an estimate of genotyping error rate $\epsilon$. 
 The final column of \textbf{G} is the probability that the father of each offspring was missing from the sample of candidates, based on the probability of observing offspring alleles from population allele frequencies.
-Rows in \textbf{G} sum to one, and describe a multinomial distribution of probabilities of paternity over all candidate fathers. FAPS then builds a similarity matrix whose \textit{ih}\textsuperscript{th} element is the likelihood
+Rows in \textbf{G} sum to one, and describe a multinomial distribution of probabilities of paternity over all candidate fathers, including unsampled fathers.
+FAPS then builds a similarity matrix whose \textit{ih}\textsuperscript{th} element is the likelihood
 
 \begin{equation}\label{eqn:faps_similarity_matrix}
     \Sigma_j^F g_{ij}g_{hj}
@@ -185,7 +186,7 @@ We can incorporate non-genetic information about paternity using a suitable func
 In principle this can be done for any kind of data for which there is a suitable function relating the observed data for a set of candidate fathers to a probability of having mating with each mother, given a set of parameter values for that function. The goal is to find parameter values that best explain the data. For example, a standardised continuous phenotype $z$ could be modelled with the logistic function $1/(1+e^{\beta z})$, where $\beta$ describes the relationship between $z$ and male fertility.
 A categorical phenotype can be modelled as a multinomial vector of probabilities that sum to one.
 In this study we use matrix \textbf{D} of Euclidean distances between mothers and candidate fathers as a covariate, and model the probability $\Pr(d_{mj}|\theta)$ of a mating event occurring between mother \textit{m} and candidate \textit{j} who are distance $d_{mj}$ apart, based on a suitable model of pollen dispersal (see below).
-Assuming phenotypes are independent of marker genotypes it is then straightforward to incorporate this into the procedure outlined above by modifying eqn. \ref{eqn:faps_similarity_matrix} to
+Assuming covariates of mating patterns are independent of marker genotypes it is then straightforward to incorporate this into the procedure outlined above by modifying eqn. \ref{eqn:faps_similarity_matrix} to
 \begin{equation}\label{eqn:pairwise_with_covariates}
 \Sigma_j^F \Pr(d_{mj} | \theta)g_{ij}g_{hj}
 \end{equation}
@@ -205,23 +206,32 @@ For a given set of dispersal parameters in $\theta$ the likelihood of the whole 
 \subsubsection{Pollen dispersal distribution}
 
 We wish to describe the distribution of distances travelled by pollen from anther to stigma \citep{nathan2012dispersal}.
-A useful function for describing plant dispersal distributions is the generalised normal distribution (\cite{clark1998trees,Nadarajah2005,kremer2012long}). This is a generalisation of the exponential family of probability distributions and includes the exponential and standard normal distributions as special cases, but allows for fat and thin tails. It is commonly used to model plant dispersal distributions because these are often found to show clear kurtotis (e.g. \cite{austerlitz2004using, robledo2005patterns, klein2008pollen, burczyk2019patterns, field2011importance, ottewell2012pollen}). The generalised normal distribution describes the probability of observing dispersal distance \textit{d} given scale parameter $a$ and shape parameter $b$:
+A useful function for describing plant dispersal distributions is the generalised normal distribution (\cite{clark1998trees,Nadarajah2005,kremer2012long}). This is a generalisation of the exponential family of probability distributions and includes the exponential and standard normal distributions as special cases, but allows for fat and thin tails. It is commonly used to model plant dispersal distributions because these are often found to show clear kurtosis (e.g. \cite{austerlitz2004using, robledo2005patterns, klein2008pollen, burczyk2019patterns, field2011importance, ottewell2012pollen}). The generalised normal distribution describes the probability of observing dispersal distance $d_{mj}$ between mother $m$ and candidate father $j$ given scale parameter $a$ and shape parameter $b$ as:
 \begin{equation}
-\Pr(d|a,b) = \exp{  (-|\frac{d}{a}| ^b) }
-\label{eqn:GND}
+    \Pr(d_{mj}|a,b) = \frac{1}{K} \exp{  (-|\frac{d_{mj}}{a}| ^b) }
+    \label{eqn:GND}
+\end{equation}
+where
+\begin{equation}
+    K = \Sigma_j^F \exp  (-|\frac{d_{mj}}{a}| ^b) 
 \end{equation}
 The function takes the forms of the standard exponential when $b=1$ and normal distribution when $b=2$. Values of $b<1$ reflect leptokurtic distributions with tails that decay more slowly than would be expected under the exponential distribution. Using $\theta={a,b}$, this provides a convenient function for calculating $\Pr(d_{mj} | \theta)$ because it allows for a long tail of long-distance migrants.
+Scaling by $K$ ensures that probabilities of dispersal distances across fathers sum to one.
 
 Sometimes it may be that an unrelated candidate has a similar or higher probability of paternity of one or more offspring simply due to stochasticity in Mendelian sampling.
 Whereas true fathers are expected to be (on average) close to the mother, other candidates should be drawn at random from the population (although this is complicated if there is substantial spatial genetic structure).
 This will inflate the apparent kurtosis in the data and bias $b$ downwards.
 To accommodate this we modify \ref{eqn:GND} to model dispersal as a mixture of a generalised-normal and a uniform distribution:
 \begin{equation}\label{eqn:mixture_model}
-\Pr(d_{mj} | a,b,\lambda) = \lambda e^{  (-\frac{d}{a} )^b } + \frac{1-\lambda}{F}
+\Pr(d_{mj} | a,b,\lambda) = \frac{
+    \lambda \Pr(d_{mj} | a,b) + \frac{1-\lambda}{F}
+    }{
+    \Sigma_j^F( \lambda \Pr(d_{mj} | a,b) + \frac{1-\lambda}{F})
+    }
 \end{equation}
 where $F$ is the number of candidate fathers and $\lambda$ is a mixture parameter determining the proportion of the probability mass due to ’real’ dispersal.
 The uniform part of this mixture allows for signal coming from incorrect candidates without requiring the 'true' dispersal kernel to be unnecessarily leptokurtotic.
-$\lambda$ also provides an approximate estimate for what the rate of false-postive assignment to medium- and long-distance candidates would have been if this had been ignored.
+This approach is conceptually similar to those of \cite{streiff1999pollen} and \cite{slavov2009extensive} who modelled dispersal as a mixture of distinct processes describing short- and long-range dispersal up to a maximum distance estimated from the data.
 
 It is common to also report the mean dispersal distance as the square root of the variance of this distribution as
 \begin{equation}
@@ -251,7 +261,7 @@ To examine the effect of modelling dispersal as a mixture model at all, we also 
 We used the Metropolis-Hastings Markov-chain Monte Carlo algorithm to infer the posterior distribution of dispersal parameters $a$, $b$ and $\lambda$.
 We ran four independent chains beginning from distant areas of the parameter space.
 At each iteration, we perturbed the value of each parameter by a factor drawn from a normal distribution with a fixed standard deviation for each parameter ($\sigma= 2$ for $a$; $\sigma= 0.05$ for $b$; $\sigma= 0.025$ for $\lambda$).
-We ran each chain for 3000 iterations and subsequently removed the first 500 iterations of each as burn-in.
+We ran each chain for 25500 iterations and subsequently removed the first 500 iterations of each as burn-in.
 After checking chain convergence we thinned subsequent iterations to retain 250 posterior draws from each chain for further analyses, for a total of 1000 posterior draws.
 
 \subsubsection{Inference of mating events}
@@ -265,7 +275,7 @@ The posterior estimate of offspring number is the number of offspring for each f
 Note that the number and size of sibships are not necessarily integers because estimates are weighted averages over plausible sibship partition structures.
 We inferred mating events in this way using eqn. \ref{eqn:faps_lik_sibship} based on dispersal parameter estimates from each of 1000 iterations of the MCMC output.
 
-We previously noted that when FAPS errs, it tends to split one individual in a sibship into a singleton family, but essentially never incorrectly merges unrelated sibships \cite{ellis2018efficient}.
+We previously noted that when FAPS is incorrect, it tends to split one individual in a sibship into a singleton family, but essentially never incorrectly merges unrelated sibships \cite{ellis2018efficient}.
 We aimed to identify correct mating events based on family sizes.
 Previous investigations of FAPS showed that the main source of error was individuals from a larger sibship group being falsely assigned to a singleton sibship, although true half-siblings are almost never merged as full siblings (\cite{ellis2018efficient}).
 This predicts that those singleton families will have posterior-mean family sizes of less than one because the nominal number of offspring is one, but the posterior probability for the family is less than one.
@@ -296,6 +306,10 @@ To vary the information about paternity shared between full siblings we varied h
 To simulate missing fathers we randomly selected 10\%, 30\% and 50\% of true sires and removed them from the set of candidate fathers.
 We simulated dispersal with mean distances of 3m, 30m and 300m.
 We repeated each parameter combination 100 times.
+We note that it is now routine to generate data with many more markers than used here, and in a previous study we did simulate additional SNPs \citep{ellis2018efficient}.
+However, denser markers will be in stronger linkage disequilibrium, meaning they are no longer independent and existing likelihood calculations are no longer valid.
+As such, additional markers do not necessarily translate into increased statistical power in a straightforward way.
+Using the observed markers also allowed us to capture the genetic structure of the population.
 
 We used simulated datasets to infer mating events using the same procedure as for the empirical dataset.
 We compared results based on mating events inferred using three sources of information.
@@ -350,9 +364,11 @@ This corresponds to around 60\% of the offspring.
 
 The posterior distribution for the dispersal shape parameter was consistently less than one, with a posterior mean of 0.57 (96\% CIs: 0.46, 0.70), indicating a leptokurtic dispersal kernel (figure \ref{fig:posterior_summaries}A).
 Posterior mean scale was 22.0 (95\% CIs: 9.1, 37.4; \ref{fig:posterior_summaries}B).
-Consistent with this, the distribution of pollen dispersal distances for families with one or more offspring shows a peak close to zero and a long tail of long-distance dispersal events up to 859m (figures \ref{fig:dispersal}B).
+
+Consistent with this, the distribution of pollen dispersal distances for families with one or more offspring shows a peak close to zero and a long tail of long-distance dispersal events up to 859m (figure \ref{fig:dispersal}).
 Mean and median dispersal distances were 83.4 and 28.0 metres respectively.
 With two exceptions, all mating occurred between plants on the lower road (figure \ref{fig:map}).
+The cumulative distribution of realised dispersal distances varied very little across the posterior distributions of scale and shape parameters (figure \ref{fig:dispersal}B), indicating that the estimated dispersal distribution is robust.
 These results indicate a leptokurtic pollen dispersal kernel.
 
 \subsection{Mixture parameter influences dispersal shape}
@@ -405,7 +421,7 @@ The improvement in identifying true mating events when including additional info
     \centering
     \includegraphics{fig-sim_dipsersal.eps}
     \caption{
-        Error in dispersal estimates in simulated data.
+        Errors in dispersal estimates in simulated data.
         Values show the absolute difference in median dispersal events between real mating events and inferred mating events with posterior-mean family sizes of one or more.
         Panels show the proportion of true fathers missing from the dataset used to infer mating events (columns) and the true full sibship size (rows).
         Values are the mean of 100 replicate simulations, and are shown for inference using paternity (Pat) only, paternity and sibships (sibs), and paternity, sibships and dispersal information.
@@ -413,7 +429,7 @@ The improvement in identifying true mating events when including additional info
     \label{fig:sim-dispersal}
 \end{figure*}
 
-We compared median dispersal of inferred mating events to true median dispersal.
+We compared median dispersal of inferred mating events to true median dispersal (figure \ref{fig:sim-dispersal}).
 Dispersal estimates were substantially more accurate when more markers were used, but showed less of a dependence on family size or the proportion of sampled fathers.
 Instead, estimated dispersal distances depended strongly on true dispersal distance; estimates were most accurate for datasets with the shortest dispersal and lest accurate for dispersal over the largest distance.
 Estimated dispersal also depended strongly on the information used to infer mating events.
@@ -432,17 +448,28 @@ Using simulations we demonstrate that sibship and population information improve
 
 The shape of the dispersal kernel implies that most mating occurs within tens of metres, but that there is a long tail of mating events between individuals at up to several hundred metres. This result suggests that any natural selection acting through male reproductive components (pollen dispersal) occurs at small spatial scales. If pollinators discriminate between different flower-colour phenotypes in the hybrid zone, this sets an important geographic scale of selection for empirical tests on pollinator-mediated selection. For example, within 20m in the core of the hybrid zone, pollinators would encounter a full range of colour phenotypes that would provide scope for colour discrimination and differential visitation to influence male and female fitness. In this paper we have not attempted to estimate selection via flower colour because the number of mothers for each flower colour is small, meaning that we likely have little statistical power. However, in ongoing work we are investigating variation in fitness in a much larger panel of offspring arrays, which will allow us to address such questions with much greater accuracy.
 
+Rare long-distance dispersal events can have unexpectedly large effects on natural populations \citep{clark1998trees}.
+We found that the most extreme pollen-dispersal events spanned many hundreds of metres.
+Since the width of the core of the hybrid zone is approximately one kilometre, this means that pollen would be able to quickly move across a substantial fraction of hybrid zone, and accelerate introgression.
+However, there are several reasons why long-distance dispersal events are especially difficult to detect.
+First, these events are intrinsically rare.
+Second, as distance increases the more plants need to be sampled to ensure the father is included.
+Third, as more candidate fathers are included the greater the chance that an unrelated fathers is falsely assigned.
+It is thus likely that we have under-estimated the tail of long-distance dispersal events to some extent.
+However, because this population is mostly confined to roadsides, our population sample extends several kilometres further than the longest dispersal event detected, and we can minimise false-positive paternity assignments by conditioning on family size, this underestimate is unlikely to be substantial.
+Nevertheless, it remains possible that even more long-range dispersal events may occur in this population, for example by larger queen bumblebees early in the season \citep{lepais2010estimation}, with the potential to have a large impact on gene flow.
+
 \subsection{Controlling bias in dispersal estimates}
 
 \subsubsection{Bias due to incorrect fathers}
 
-Sometimes candidate pollen donors can have a similar or greater probability of paternity for an offspring individual as does the true father due to stochasticity in Mendelian sampling (\cite{thompson1976paradox}).
+Sometimes candidate pollen donors can have a similar or greater Mendelian probability of paternity for an offspring individual as does the true father due to stochasticity in Mendelian sampling (\cite{thompson1976paradox}).
 If not addressed, we might infer an incorrect mating event between adult plants, which would bias estimates of dispersal upwards.
 Two aspects of our study suggest that signal from false fathers should have a minimal effect on our results.
 
 First, our simulations showed that incorrect families could be readily identified based on family size.
 In previous simulations to test the performance of FAPS we found that the main source of error was individuals from a larger sibship group being falsely assigned to a singleton sibship, but this analysis focussed on the most likely partition structure to simplify results (\cite{ellis2018efficient}).
-In this study we found that those incorrect singleton families have only weak posterior probabilities when we consider a whole set of plausible sibship configurations, meaning that family sizes are effectively less than one individual.
+In this study we found that those incorrect singleton families have low posterior probabilities when considered as part of a whole set of plausible sibship configurations, meaning that family sizes are effectively less than one individual.
 Since our goal was to infer pollen dispersal by identifying mate pairs, excluding mating events for families with sizes less than one is an effective way to identify a conservative set of high-confidence mating events, even if this means that some true mating events are lost.
 Consistent with this, in simulated data that closely match the \textit{A.~majus} dataset we found that estimated dispersal was very close to the true values, indicating that false-positive mating events have not had a large influence on our estimates of dispersal.
 This demonstrates that accounting for uncertainty in sibship structure is an extremely useful way to improve the accuracy of paternity inference.
@@ -451,10 +478,10 @@ Second, we modelled dispersal as a mixture distribution with a term allowing for
 The mixture distribution reduces the bias in the estimated shape parameter and the second moment of the generalised normal distribution, often interpreted as mean (squared) dispersal distance (e.g. \cite{clark1998trees, austerlitz2004using, klein2008pollen}).
 We note that this bias will exist to some extent as long as knowledge of paternity is less than perfect.
 Moreover, two factors may complicate the interpretation of the mixture paramter.
-First, the idea assumes that unrelated pollen donors are distributed at random with respect to genotypes, which will not be the case if there is spatial genetic structure.
+First, the idea assumes that unrelated candidates are distributed at random with respect to genotypes, which will not be the case if there is spatial genetic structure.
 In the case of the \textit{A.~majus} populaton the marker panel was designed to show very little spatial structure, so this is unlikely to have a substantial impact.
 Second, more distant mating events may be real, but reflect some other distribution process than that modelled by the generalised normal distribution.
-In this case, the mixture component is still useful in that it allows these two distributions to be decoupled, at least to some extent.
+In this case, the mixture component is still useful in that it allows these two distributions to be decoupled, at least to some extent \citep{streiff1999pollen, slavov2009extensive}.
 Here, our biological conclusions are not affected, because we focus on the distribution of realised mating events, which are affected in only a minor way in real terms (figure \ref{fig:dispersal}).
 However, caution is warranted in the interpretation of the raw parameter values for shape and mean dispersal from the generalised normal distribution (figure S8).
 It is possible that the effect was stronger here than would be the case in other published studies because our sample of candidate fathers is large, and the spatial extend is much larger (two orders of magnitude) than median dispersal distance.
