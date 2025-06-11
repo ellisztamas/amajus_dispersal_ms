@@ -69,6 +69,12 @@ prior_values <- list(
   sim   = NULL
 )
 
+hist(
+  rlnorm(nsims, meanlog = -0.7, sdlog=0.5)
+)
+
+
+
 # run the simulation
 prior_values$sim  <- prior_sim(
   x,
